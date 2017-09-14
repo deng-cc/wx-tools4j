@@ -150,26 +150,11 @@ public class WxAction extends WxSupport{
         super.execute(request, response);
     }
 
+    //消息处理
     @Override
     protected void handleText() {
         String userContent = wxRequestParams.getContent();
-        if ("image".equals(userContent)) {
-            responseImage("sdS18-X3fbHeHOfRYaa172Ekufol0AKVBPyUTy-9EIKXp152VnWeTh6Ldu4AGhmg");
-        } else
-        if ("voice".equals(userContent)) {
-            responseVoice("wcri6jBQQld-OjcMSUmNiOTNlXUeznVnZYMNDnXwOr1KmGTzbgyx-4MKv8xSTniw");
-        } else
-        if ("video".equals(userContent)) {
-            responseVideo(new Video("0pASrB2qJyEEReNXZYEHVzsFlpHOKmnvnD4z585nCyz8rdm4er9sB2LrHE3syG_6"));
-        } else
-        if ("thumb".equals(userContent)) {
-            responseImage("FcdUJv0MzxnbElzwixQWgOp8rkxNUFi9-EuzPll_EupeRg1Iav4DPgmX7ftlxz6H");
-        }
-
-
-        else {
-            responseText("您输入的信息是：" + userContent);
-        }
+        responseText("您输入的信息是：" + userContent);
     }
 
     @Override
@@ -194,51 +179,56 @@ public class WxAction extends WxSupport{
 
     @Override
     protected void handleShortVideo() {
-
+        //todo 待测试
+        responseText("你好像发送了一个小视频");
     }
 
     @Override
     protected void handleLocation() {
-
+        responseText("嗯，经度是" + wxRequestParams.getLocationY() + ", 纬度是" + wxRequestParams.getLocationX());
     }
 
     @Override
     protected void handleLink() {
-
+        responseText("你发送了一个链接：" + wxRequestParams.getUrl());
     }
 
+    //事件处理
     @Override
     protected void doSubscribe() {
-
+        responseText("Hi, 欢迎来到Dulk的测试公众号~");
     }
 
     @Override
     protected void doUnsubscribe() {
-
+        System.out.println("又有一位用户离开了我们的测试公众号");
     }
 
     @Override
     protected void doQR_Subscribe() {
-
+        //todo 待测试
+        responseText("Hi, 欢迎通过带参的二维码来到Dulk的测试公众号~");
     }
 
     @Override
     protected void doQR_Scan() {
-
+        //todo 待测试
     }
 
     @Override
     protected void doLocation() {
-
+        //todo 待测试
+        System.out.println("用户上报了地理位置");
     }
 
     @Override
     protected void doMenu_Click() {
-
+        responseText("你点击了菜单哦");
     }
 
     @Override
     protected void doMenu_View() {
-
+        //todo 待测试
+        System.out.println("用户点击了按钮网页浏览");
     }
 }

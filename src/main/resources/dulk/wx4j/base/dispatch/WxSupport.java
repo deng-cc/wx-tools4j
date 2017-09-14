@@ -28,8 +28,8 @@ import java.util.List;
  */
 public abstract class WxSupport {
 
-    protected WxRequestParams wxRequestParams = new WxRequestParams();
-    protected WxResponseParams wxResponseParams = new WxResponseParams();
+    protected WxRequestParams wxRequestParams;
+    protected WxResponseParams wxResponseParams;
 
     /**
      * 微信信息和事件处理的执行入口，执行数据的接受和事件分发
@@ -57,6 +57,8 @@ public abstract class WxSupport {
      * @param request
      */
     private void parseData(HttpServletRequest request) {
+        this.wxRequestParams = new WxRequestParams();
+        this.wxResponseParams = new WxResponseParams();
         try {
             //设置编码格式避免乱码
             request.setCharacterEncoding("UTF-8");
@@ -198,27 +200,116 @@ public abstract class WxSupport {
         }
     }
 
+    /**
+     * 事件分发和处理
+     * @param eventType 事件类型
+     */
     private void dispatchEvent(String eventType) {
         //关注
         if (WxMsgAPI.EVENT_TYPE_SUBSCRIBE.equals(eventType)) {
-
+            doSubscribe();
+        }
+        //取消关注
+        if (WxMsgAPI.EVENT_TYPE_UNSUBSCRIBE.equals(eventType)) {
+            doUnsubscribe();
+        }
+        //二维码带参关注
+        if (WxMsgAPI.EVENT_TYPE_SUBSCRIBE.equals(eventType) && wxRequestParams.getEventKey().startsWith("qrscene_")) {
+            doQR_Subscribe();
+        }
+        //二维码扫描
+        if (WxMsgAPI.EVENT_TYPE_SCAN.equals(eventType)) {
+            doQR_Scan();
+        }
+        //上报地理位置
+        if (WxMsgAPI.EVENT_TYPE_LOCATION.equals(eventType)) {
+            doLocation();
+        }
+        //菜单点击拉取消息
+        if (WxMsgAPI.EVENT_TYPE_MENU_CLICK.equals(eventType)) {
+            doMenu_Click();
+        }
+        //菜单点击浏览网页
+        if (WxMsgAPI.EVENT_TYPE_MENU_VIEW.equals(eventType)) {
+            doMenu_View();
         }
     }
 
+    /**
+     * 处理用户发送来的文本信息
+     */
     protected abstract void handleText();
+
+    /**
+     * 处理用户发来的图片信息
+     */
     protected abstract void handleImage();
+
+    /**
+     * 处理用户发来的语音信息
+     */
     protected abstract void handleVoice();
+
+    /**
+     * 处理用户发来的视频信息
+     */
     protected abstract void handleVideo();
+
+    /**
+     * 处理用户发来的小视频信息
+     * <p>todo:给公众号发送拍摄视频默认为video而非shortVideo，暂未找到触发小视频消息的方式</p>
+     */
     protected abstract void handleShortVideo();
+
+    /**
+     * 处理用户发来的地理位置
+     */
     protected abstract void handleLocation();
+
+    /**
+     * 处理用户发来的链接
+     * <p>该链接非普通的形如发送"www.google.com"，该形态会被视为文本</p>
+     * <p>该链接指类似微信分享而产生的链接信息，类似卡片形态，带有标题/摘要/缩略图</p>
+     */
     protected abstract void handleLink();
 
+    /**
+     * 处理用户的关注事件
+     */
     protected abstract void doSubscribe();
+
+    /**
+     * 处理用户的取消关注事件
+     */
     protected abstract void doUnsubscribe();
+
+    /**
+     * 处理用户的二维码扫描关注事件
+     * <p>该二维码参数中必须带有事件值，否则二维码扫码关注视为普通的关注事件</p>
+     * <p>事件值为qrscene_为前缀，后面为二维码的参数值</p>
+     */
     protected abstract void doQR_Subscribe();
+
+    /**
+     * 处理用户的二维码扫码事件
+     */
     protected abstract void doQR_Scan();
+
+    /**
+     * 处理用户的地理位置上报事件
+     * <p>该处的地理位置上报并非用户发送地理位置</p>
+     * <p>而是用户同意上报地理位置后，每次进入公众号会上报地理位置，或进入会话后每5秒上报一次地理位置</p>
+     */
     protected abstract void doLocation();
+
+    /**
+     * 处理用户的菜单点击拉取消息的事件
+     */
     protected abstract void doMenu_Click();
+
+    /**
+     * 处理用户的菜单点击浏览网页的事件
+     */
     protected abstract void doMenu_View();
 
     
