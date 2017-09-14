@@ -1,0 +1,30 @@
+<!DOCTYPE web-app PUBLIC
+ "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+ "http://java.sun.com/dtd/web-app_2_3.dtd" >
+
+<web-app>
+    <display-name>Archetype Created Web Application</display-name>
+
+    <!--微信参数初始化监听器-->
+    <listener>
+        <listener-class>dulk.wx4j.base.init.InitWxConfigListener</listener-class>
+    </listener>
+
+    <!--Demo微信控制器SpringMVC-->
+    <servlet>
+        <servlet-name>CoreDispatcherServlet</servlet-name>
+        <servlet-class>
+            org.springframework.web.servlet.DispatcherServlet
+        </servlet-class>
+            <init-param>
+                <param-name>contextConfigLocation</param-name>
+                <param-value>/WEB-INF/classes/spring-mvc.xml</param-value>
+            </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>CoreDispatcherServlet</servlet-name>
+        <url-pattern>*.do</url-pattern>
+    </servlet-mapping>
+
+</web-app>
