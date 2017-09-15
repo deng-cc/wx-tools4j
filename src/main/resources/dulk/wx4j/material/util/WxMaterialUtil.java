@@ -200,8 +200,8 @@ public class WxMaterialUtil {
             }
             log.debug(type.getValue() + " mediaId :" + mediaId);
         } catch (WxException e) {
-            log.warn(e.getText());
-            throw new WxException(e.getCode());
+            log.warn(e.getMessage());
+            throw new WxException(e.getCode(), e.getErrMsg());
         }
         return mediaId;
     }

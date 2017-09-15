@@ -46,26 +46,26 @@ public class WxException extends Exception{
     private String code;
     /** 错误信息 */
     private String text;
+    /** 错误信息（微信服务器返回） */
+    private String errMsg;
 
-    public WxException(String code) {
-        super(wxErrorCode.get(code));
+    public WxException(String code, String errMsg) {
+        super(wxErrorCode.get(code) + " " + code + ":" + errMsg);
         this.code = code;
         this.text = wxErrorCode.get(code);
+        this.errMsg = errMsg;
     }
 
     public String getCode() {
         return code;
     }
 
-    public void setCode(String code) {
-        this.code = code;
-    }
-
     public String getText() {
         return text;
     }
 
-    public void setText(String text) {
-        this.text = text;
+    public String getErrMsg() {
+        return errMsg;
     }
+
 }

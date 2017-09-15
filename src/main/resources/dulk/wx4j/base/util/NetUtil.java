@@ -46,8 +46,9 @@ public class NetUtil {
 
         JSONObject resultJSON = JSON.parseObject(result);
         String errorCode = resultJSON.getString("errcode");
+        String errorMsg = resultJSON.getString("errmsg");
         if (errorCode != null && !"0".equals(errorCode)) {
-            throw new WxException(errorCode);
+            throw new WxException(errorCode, errorMsg);
         }
 
         return resultJSON;
@@ -75,8 +76,9 @@ public class NetUtil {
 
         JSONObject resultJSON = JSON.parseObject(result);
         String errorCode = resultJSON.getString("errcode");
+        String errorMsg = resultJSON.getString("errmsg");
         if (errorCode != null && !"0".equals(errorCode)) {
-            throw new WxException(errorCode);
+            throw new WxException(errorCode, errorMsg);
         }
 
         return resultJSON;
@@ -154,8 +156,9 @@ public class NetUtil {
         log.debug(result);
         JSONObject resultJSON = JSON.parseObject(result);
         String errorCode = resultJSON.getString("errcode");
+        String errorMsg = resultJSON.getString("errmsg");
         if (errorCode != null && !"0".equals(errorCode)) {
-            throw new WxException(errorCode);
+            throw new WxException(errorCode, errorMsg);
         }
         return resultJSON;
     }
