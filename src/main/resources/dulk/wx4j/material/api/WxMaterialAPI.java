@@ -30,7 +30,7 @@ public class WxMaterialAPI {
      *   accessToken 接口调用凭证
      *   type 素材类型
      */
-    private static String url_getTempMediaId = "https://api.weixin.qq.com/cgi-bin/media/upload?access_token=%s&type=%s";
+    private static String url_uploadTemp = "https://api.weixin.qq.com/cgi-bin/media/upload?access_token=%s&type=%s";
 
     /**
      * "获取临时素材"的接口
@@ -39,14 +39,30 @@ public class WxMaterialAPI {
      *   accessToken 接口调用凭证
      *   mediaId 临时素材的mediaId，通过上传接口获取
      */
-    private static String url_downloadTempMedia = "https://api.weixin.qq.com/cgi-bin/media/get?access_token=%s&media_id=%s";
+    private static String url_downloadTemp = "https://api.weixin.qq.com/cgi-bin/media/get?access_token=%s&media_id=%s";
+
+    /**
+     * "新增永久图文素材"的接口
+     * https协议，POST请求
+     * 参数
+     *   accessToken 接口调用凭证
+     */
+    private static String url_uploadPermNews = "https://api.weixin.qq.com/cgi-bin/material/add_news?access_token=%s";
+
+    private static String url_uploadPermNewsImage;
+
+    private static String url_uploadPermMedia;
+
 
     public static String getUrl_getTempMediaId(MaterialType type) {
-        return String.format(url_getTempMediaId, WxConfig.getAccessToken(), type.getValue());
+        return String.format(url_uploadTemp, WxConfig.getAccessToken(), type.getValue());
     }
 
     public static String getUrl_downloadTempMedia(String mediaId) {
-        return String.format(url_downloadTempMedia, WxConfig.getAccessToken(), mediaId);
+        return String.format(url_downloadTemp, WxConfig.getAccessToken(), mediaId);
     }
 
+    public static String getUrl_uploadPermNews() {
+        return String.format(url_uploadPermNews, WxConfig.getAccessToken());
+    }
 }

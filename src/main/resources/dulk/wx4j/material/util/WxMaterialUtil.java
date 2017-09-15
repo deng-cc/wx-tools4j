@@ -1,8 +1,9 @@
 package dulk.wx4j.material.util;
 
+import com.alibaba.fastjson.JSON;
 import dulk.wx4j.base.exception.WxException;
 import dulk.wx4j.base.util.NetUtil;
-import dulk.wx4j.material.api.WxMaterialAPI;
+import dulk.wx4j.material.domain.News;
 import dulk.wx4j.material.exception.MaterialException;
 import dulk.wx4j.material.api.MaterialType;
 import static dulk.wx4j.material.api.WxMaterialAPI.*;
@@ -126,7 +127,7 @@ public class WxMaterialUtil {
      * @throws WxException
      */
     public static File downloadTemp(File file, String mediaId) {
-        String url = WxMaterialAPI.getUrl_downloadTempMedia(mediaId);
+        String url = getUrl_downloadTempMedia(mediaId);
         //视频不支持https下载，NetUtil中均为https协议请求，故此处选择http协议
         if (isAllowedType(ALLOWED_TEMP_VIDEO_TYPE, file)) {
             try {
@@ -157,6 +158,25 @@ public class WxMaterialUtil {
             return NetUtil.sendRequestGET(url, file);
         }
     }
+
+
+    /**
+     * 上传永久图文消息素材
+     *
+     * @param news 图文消息实体类
+     * @return 永久图文消息素材的mediaId
+     * @throws WxException
+     */
+    public static String uploadPermNews(News news) throws WxException {
+        String url = getUrl_uploadPermNews();
+        String content = JSON.toJSONString(news);
+        return NetUtil.sendRequestPOST(url, content).getString("media_id");
+    }
+
+    
+
+
+
 
 
 
