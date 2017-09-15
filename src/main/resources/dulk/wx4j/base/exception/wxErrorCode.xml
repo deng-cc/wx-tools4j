@@ -794,6 +794,10 @@
 		<code>48006</code>
 		<text>api禁止清零调用次数，因为清零次数达到上限</text>
 	</error>
+    <error>
+		<code>48008</code>
+		<text>无权限操作该类别的消息</text>
+	</error>
 	<error>
 		<code>49003</code>
 		<text>传入的openid不属于此AppID</text>
