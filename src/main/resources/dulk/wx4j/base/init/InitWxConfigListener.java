@@ -2,6 +2,7 @@ package dulk.wx4j.base.init;
 
 
 import dulk.wx4j.base.api.WxConfig;
+import dulk.wx4j.base.exception.WxException;
 import dulk.wx4j.base.service.WxBaseService;
 import dulk.wx4j.base.util.SignUtil;
 import org.apache.log4j.Logger;
@@ -33,9 +34,18 @@ public class InitWxConfigListener implements ServletContextListener{
     private static TimerTask timerTask = new TimerTask() {
         @Override
         public void run() {
-            String accessToken = WxBaseService.getNewAccessToken();
+            String accessToken = null;
+            try {
+                accessToken = WxBaseService.getNewAccessToken();
+            } catch (WxException e) {
+                e.printStackTrace();
+            }
             WxConfig.setAccessToken(accessToken);
-            log.info("accessToken刷新：" + accessToken);
+            if (accessToken == null) {
+                log.error("accessToken为null");
+            } else {
+                log.info("accessToken刷新：" + accessToken);
+            }
         }
     };
 

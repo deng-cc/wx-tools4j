@@ -32,12 +32,21 @@ public class WxMaterialAPI {
      */
     private static String url_getTempMediaId = "https://api.weixin.qq.com/cgi-bin/media/upload?access_token=%s&type=%s";
 
+    /**
+     * "获取临时素材"的接口
+     * https协议，GET请求
+     * 参数
+     *   accessToken 接口调用凭证
+     *   mediaId 临时素材的mediaId，通过上传接口获取
+     */
+    private static String url_downloadTempMedia = "https://api.weixin.qq.com/cgi-bin/media/get?access_token=%s&media_id=%s";
+
     public static String getUrl_getTempMediaId(MaterialType type) {
         return String.format(url_getTempMediaId, WxConfig.getAccessToken(), type.getValue());
     }
 
-
-
-
+    public static String getUrl_downloadTempMedia(String mediaId) {
+        return String.format(url_downloadTempMedia, WxConfig.getAccessToken(), mediaId);
+    }
 
 }

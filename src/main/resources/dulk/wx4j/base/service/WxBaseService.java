@@ -21,15 +21,9 @@ public class WxBaseService {
      * 立即刷新获取一个新的accessToken
      * @return
      */
-    public static String getNewAccessToken() {
-        String token = null;
-        try {
-            token = NetUtil.sendRequestGET(WxBaseAPI.getUrl_getAccessToken()).getString("access_token");
-            WxConfig.setAccessToken(token);
-        } catch (WxException e) {
-            log.error(e.getText());
-            e.printStackTrace();
-        }
+    public static String getNewAccessToken() throws WxException {
+        String token = NetUtil.sendRequestGET(WxBaseAPI.getUrl_getAccessToken()).getString("access_token");
+        WxConfig.setAccessToken(token);
 
         return token;
     }

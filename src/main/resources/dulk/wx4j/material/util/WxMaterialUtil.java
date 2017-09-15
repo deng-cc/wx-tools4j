@@ -2,6 +2,7 @@ package dulk.wx4j.material.util;
 
 import dulk.wx4j.base.exception.WxException;
 import dulk.wx4j.base.util.NetUtil;
+import dulk.wx4j.material.api.WxMaterialAPI;
 import dulk.wx4j.material.exception.MaterialException;
 import dulk.wx4j.material.api.MaterialType;
 import static dulk.wx4j.material.api.WxMaterialAPI.*;
@@ -15,15 +16,18 @@ import org.jaudiotagger.audio.mp3.MP3File;
 import org.jaudiotagger.tag.TagException;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Arrays;
 
 /**
- * WxMaterialUtil.
- *
- * @author Dulk
- * @version 20170913
- * @date 17-9-13
+ * 临时素材的相关工具类
+ * <p>封装了临时素材相关的功能，如上传，下载等</p>
  */
 public class WxMaterialUtil {
     private static Logger log = Logger.getLogger(WxMaterialUtil.class);
@@ -32,7 +36,7 @@ public class WxMaterialUtil {
      * 上传临时图片素材
      *
      * @param file
-     * @return
+     * @return 临时图片素材的mediaId
      * @throws MaterialException
      * @throws WxException
      */
@@ -52,7 +56,7 @@ public class WxMaterialUtil {
      * 上传临时语音素材
      *
      * @param file
-     * @return
+     * @return 临时语音素材的mediaId
      * @throws MaterialException
      * @throws WxException
      */
@@ -75,7 +79,7 @@ public class WxMaterialUtil {
      * 上传临时视频素材
      *
      * @param file
-     * @return
+     * @return 临时视频素材的mediaId
      * @throws MaterialException
      * @throws WxException
      */
@@ -95,7 +99,7 @@ public class WxMaterialUtil {
      * 上传临时缩略图素材
      *
      * @param file
-     * @return
+     * @return 临时缩略图素材的mediaId
      * @throws MaterialException
      * @throws WxException
      */
@@ -111,7 +115,48 @@ public class WxMaterialUtil {
         return uploadTemp(file, MaterialType.THUMB);
     }
 
+    /**
+     * 下载临时素材
+     * <p>封装的File文件类的文件类型，必须和mediaId对应的素材类型相同，否则很容易抛出异常</p>
+     * <p>如new File("C:\\temp.mp4")，则mediaId必须对应的是视频素材，否则容易抛出WxException，或因为json解析而抛出JSONException</p>
+     *
+     * @param file    将要写入内容的File类
+     * @param mediaId 临时素材的mediaId
+     * @return 下载文件的File类
+     * @throws WxException
+     */
+    public static File downloadTemp(File file, String mediaId) {
+        String url = WxMaterialAPI.getUrl_downloadTempMedia(mediaId);
+        //视频不支持https下载，NetUtil中均为https协议请求，故此处选择http协议
+        if (isAllowedType(ALLOWED_TEMP_VIDEO_TYPE, file)) {
+            try {
+                url = NetUtil.sendRequestGET(url).getString("video_url");
+                URL urlObj = new URL(url);
+                HttpURLConnection coon = (HttpURLConnection) urlObj.openConnection();
+                InputStream is = coon.getInputStream();
+                OutputStream os = new FileOutputStream(file);
+                int size = -1;
+                byte[] cache = new byte[1024];
+                while ((size = is.read(cache)) != -1) {
+                    os.write(cache, 0, size);
+                }
+                os.close();
+                is.close();
+                coon.disconnect();
 
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (WxException e) {
+                e.printStackTrace();
+            }
+            return file;
+
+        } else {
+            return NetUtil.sendRequestGET(url, file);
+        }
+    }
 
 
 
@@ -164,13 +209,10 @@ public class WxMaterialUtil {
         return ArrayUtils.contains(allowedTypes, type);
     }
 
-
     /**
      * 判断语音文件的播放时间长度（单位：秒）
-     * <p>
-     * 参考链接
-     *     mp3/amr: http://www.cnblogs.com/yoyotl/p/5614530.html
-     * </p>
+     * <p>参考链接 mp3/amr: http://www.cnblogs.com/yoyotl/p/5614530.html</p>
+     *
      * @param file
      * @return
      */
@@ -196,9 +238,6 @@ public class WxMaterialUtil {
         log.debug("media duration : " + period + " seconds");
         return period;
     }
-
-
-
 
 
 
