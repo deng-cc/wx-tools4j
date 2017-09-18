@@ -12,11 +12,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * WxException.
- *
- * @author Dulk
- * @version 20170811
- * @date 17-8-11
+ * 微信业务异常
+ * <p>该异常类主要封装微信服务器返回的错误信息</p>
+ * <p>code为微信服务器返回的错误码</p>
+ * <p>text为错误码对应的中文错误信息，在xml中进行配置和读取</p>
+ * <p>message包含了错误码、错误信息，以及微信服务器返回的英文错误信息</p>
  */
 public class WxException extends Exception{
     private static Logger log = Logger.getLogger(WxException.class);
