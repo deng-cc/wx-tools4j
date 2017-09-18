@@ -90,10 +90,11 @@ public class NetUtil {
      *
      * @param url  请求地址url
      * @param file 需要上传的文件
+     * @param fileDesc 额外需要提交的文件描述信息(JSON格式)，如微信提交视频文件要求增加json格式的文件描述
      * @return 返回结果的JSONObject
      * @throws Exception
      */
-    public static JSONObject uploadMediaPost(String url, File file) throws WxException {
+    public static JSONObject uploadMediaPost(String url, File file, String... fileDesc) throws WxException {
         BufferedReader reader = null;
         String result = null;
         String line = null;
@@ -129,6 +130,24 @@ public class NetUtil {
             }
             byte[] foot = ("\r\n--" + BOUNDARY + "\r\n").getBytes("UTF-8");
             out.write(foot);
+
+            //参考 http://www.bijishequ.com/detail/457835?p=
+            String content = null;
+            for (String desc : fileDesc) {
+                content = desc;
+            }
+            if (content != null) {
+                StringBuffer sb = new StringBuffer();
+                sb.append("--");
+                sb.append(BOUNDARY);
+                sb.append("\r\n");
+                sb.append("Content-Disposition: form-data;name=\"description\";");
+                sb.append("Content-Type:application/octet-stream\r\n\r\n");
+                out.write(sb.toString().getBytes());
+                out.write(content.getBytes());
+                out.write(("\r\n--" + BOUNDARY + "--\r\n").getBytes("utf-8"));
+            }
+
             out.flush();
             out.close();
 

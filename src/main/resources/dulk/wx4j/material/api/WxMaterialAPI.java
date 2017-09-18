@@ -22,6 +22,23 @@ public class WxMaterialAPI {
     //其他临时素材的条件限制
     public static final long ALLOWED_TEMP_VOICE_TIME = 60; //临时语音的播放长度限制，单位：秒
 
+    //各永久素材的类型限制
+    public static final String[] ALLOWED_PERM_NEWSIMAGE_TYPE = {"png", "jpg"};
+    public static final String[] ALLOWED_PERM_IMAGE_TYPE = {"bmp", "png", "jpeg", "jpg", "gif"};
+    public static final String[] ALLOWED_PERM_VOICE_TYPE = {"mp3", "wma", "wav", "amr", "mka"};
+    public static final String[] ALLOWED_PERM_VIDEO_TYPE = {"mp4"};
+    public static final String[] ALLOWED_PERM_THUMB_TYPE = {"jpg"};
+
+    //各永久素材的大小限制，单位：字节
+    public static final long ALLOWED_PERM_NEWSIMAGE_SIZE = 1024 * 1024 * 1;
+    public static final long ALLOWED_PERM_IMAGE_SIZE = 1024 * 1024 * 2;
+    public static final long ALLOWED_PERM_VOICE_SIZE = 1024 * 1024 * 2;
+    public static final long ALLOWED_PERM_VIDEO_SIZE = 1024 * 1024 * 10;
+    public static final long ALLOWED_PERM_THUMB_SIZE = 1024 * 64;
+
+    //其他永久素材的条件限制
+    public static final long ALLOWED_PERM_VOICE_TIME = 60; //永久语音的播放长度限制，单位：秒
+
 
     /**
      * "新增临时素材"的接口，返回的临时素材mediaId有效期3天
@@ -49,9 +66,23 @@ public class WxMaterialAPI {
      */
     private static String url_uploadPermNews = "https://api.weixin.qq.com/cgi-bin/material/add_news?access_token=%s";
 
-    private static String url_uploadPermNewsImage;
+    /**
+     * "上传图文消息内图片"的接口
+     * https协议，POST请求
+     * 参数
+     *   accessToken 接口调用凭证
+     */
+    private static String url_uploadPermNewsImage = "https://api.weixin.qq.com/cgi-bin/media/uploadimg?access_token=%s";
 
-    private static String url_uploadPermMedia;
+    /**
+     * "上传其他类型永久素材"的接口
+     * <p>其他媒体文件类型，包括图片、语音、视频和缩略图</p>
+     * https协议，POST请求
+     * 参数
+     *   accessToken 接口调用凭证
+     *   type 文件类型
+     */
+    private static String url_uploadPermMedia = "https://api.weixin.qq.com/cgi-bin/material/add_material?access_token=%s&type=%s";
 
 
     public static String getUrl_getTempMediaId(MaterialType type) {
@@ -64,5 +95,13 @@ public class WxMaterialAPI {
 
     public static String getUrl_uploadPermNews() {
         return String.format(url_uploadPermNews, WxConfig.getAccessToken());
+    }
+
+    public static String getUrl_uploadPermNewsImage() {
+        return String.format(url_uploadPermNewsImage, WxConfig.getAccessToken());
+    }
+
+    public static String getUrl_uploadPermMedia(MaterialType type) {
+        return String.format(url_uploadPermMedia, WxConfig.getAccessToken(), type.getValue());
     }
 }

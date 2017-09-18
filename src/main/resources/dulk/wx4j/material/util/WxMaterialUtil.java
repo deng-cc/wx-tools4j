@@ -1,9 +1,11 @@
 package dulk.wx4j.material.util;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import dulk.wx4j.base.exception.WxException;
 import dulk.wx4j.base.util.NetUtil;
 import dulk.wx4j.material.domain.News;
+import dulk.wx4j.material.domain.PermImage;
 import dulk.wx4j.material.exception.MaterialException;
 import dulk.wx4j.material.api.MaterialType;
 import static dulk.wx4j.material.api.WxMaterialAPI.*;
@@ -173,13 +175,137 @@ public class WxMaterialUtil {
         return NetUtil.sendRequestPOST(url, content).getString("media_id");
     }
 
+    /**
+     * 上传图文消息内的图片获取url
+     * <p>该方法上传图片不占用公众号永久素材库的上限</p>
+     *
+     * @param file
+     * @return 图文消息内图片的url
+     */
+    public static String uploadPermNewsImage(File file) throws MaterialException, WxException {
+        if (!isAllowedType(ALLOWED_PERM_NEWSIMAGE_TYPE, file)) {
+            throw new MaterialException("上传图文消息内图片格式不符要求，支持"
+                    + Arrays.toString(ALLOWED_PERM_NEWSIMAGE_TYPE));
+        }
+        if (file.length() > ALLOWED_PERM_NEWSIMAGE_SIZE) {
+            throw new MaterialException("上传图文消息内图片大小超过限制，最大支持"
+                    + ALLOWED_PERM_NEWSIMAGE_SIZE / 1024 / 1024 + "M");
+        }
+        String url = getUrl_uploadPermNewsImage();
+        String imageUrl = NetUtil.uploadMediaPost(url, file).getString("url");
+        log.debug("perm newsImage url :" + imageUrl);
+        return imageUrl;
+    }
+
+    /**
+     * 上传永久图片素材
+     *
+     * @param file
+     * @return 永久图片素材的封装类PermImage，包括图片的mediaId和url
+     * @throws MaterialException
+     * @throws WxException
+     */
+    public static PermImage uploadPermImage(File file) throws MaterialException, WxException {
+        if (!isAllowedType(ALLOWED_PERM_IMAGE_TYPE, file)) {
+            throw new MaterialException("上传永久图片格式不符要求，支持"
+                    + Arrays.toString(ALLOWED_PERM_IMAGE_TYPE));
+        }
+        if (file.length() > ALLOWED_PERM_IMAGE_SIZE) {
+            throw new MaterialException("上传永久图片大小超过限制，最大支持"
+                    + ALLOWED_PERM_IMAGE_SIZE / 1024 / 1024 + "M");
+        }
+        String url = getUrl_uploadPermMedia(MaterialType.IMAGE);
+        JSONObject result = NetUtil.uploadMediaPost(url, file);
+        String mediaId = result.getString("media_id");
+        String imageUrl = result.getString("url");
+        log.debug("perm image mediaId :" + mediaId + "; url :" + imageUrl);
+        return new PermImage(mediaId, imageUrl);
+    }
+
+    /**
+     * 上传永久语音素材
+     * <p>todo:对于wma、wav两种格式的时长无法判断，目前交由微信服务器判断，超时长则抛出WxException</p>
+     *
+     * @param file
+     * @return 永久语音素材的mediaId
+     * @throws MaterialException
+     * @throws WxException
+     */
+    public static String uploadPermVoice(File file) throws MaterialException, WxException {
+        if (!isAllowedType(ALLOWED_PERM_VOICE_TYPE, file)) {
+            throw new MaterialException("上传永久语音格式不符要求，支持"
+                    + Arrays.toString(ALLOWED_PERM_VOICE_TYPE));
+        }
+        if (file.length() > ALLOWED_PERM_VOICE_SIZE) {
+            throw new MaterialException("上传永久语音大小超过限制，最大支持"
+                    + ALLOWED_PERM_VOICE_SIZE / 1024 / 1024 + "M");
+        }
+        if (getVoicePeriod(file) > ALLOWED_PERM_VOICE_TIME) {
+            throw new MaterialException("上传永久语音超过时长，播放长度不超过" + ALLOWED_PERM_VOICE_TIME + "s");
+        }
+        String url = getUrl_uploadPermMedia(MaterialType.VOICE);
+        String mediaId = NetUtil.uploadMediaPost(url, file).getString("media_id");
+        log.debug("perm voice mediaId :" + mediaId);
+        return mediaId;
+    }
+
+    /**
+     * 上传永久视频素材
+     *
+     * @param file
+     * @param title 视频标题
+     * @param introduction 视频描述（简介）
+     * @return 永久视频素材的mediaId
+     * @throws MaterialException
+     * @throws WxException
+     */
+    public static String uploadPermVideo(File file, String title, String introduction) throws MaterialException, WxException {
+        if (!isAllowedType(ALLOWED_PERM_VIDEO_TYPE, file)) {
+            throw new MaterialException("上传永久视频格式不符要求，支持"
+                    + Arrays.toString(ALLOWED_PERM_VIDEO_TYPE));
+        }
+        if (file.length() > ALLOWED_PERM_VIDEO_SIZE) {
+            throw new MaterialException("上传永久视频大小超过限制，最大支持"
+                    + ALLOWED_PERM_VIDEO_SIZE / 1024 / 1024 + "M");
+        }
+        String url = getUrl_uploadPermMedia(MaterialType.VIDEO);
+        String content = String.format("{\"title\":\"%s\",\"introduction\":\"%s\"}", title, introduction);
+        String mediaId = NetUtil.uploadMediaPost(url, file, content).getString("media_id");
+        log.debug("perm video mediaId :" + mediaId);
+        return mediaId;
+    }
+
+    /**
+     * 上传永久缩略图素材
+     *
+     * @param file
+     * @return 永久缩略图素材的封装类PermImage，包括图片的mediaId和url
+     * @throws MaterialException
+     * @throws WxException
+     */
+    public static PermImage uploadPermThumb(File file) throws MaterialException, WxException {
+        if (!isAllowedType(ALLOWED_PERM_THUMB_TYPE, file)) {
+            throw new MaterialException("上传永久缩略图格式不符要求，支持"
+                    + Arrays.toString(ALLOWED_PERM_THUMB_TYPE));
+        }
+        if (file.length() > ALLOWED_PERM_THUMB_SIZE) {
+            throw new MaterialException("上传永久缩略图超过限制，最大支持"
+                    + ALLOWED_PERM_THUMB_SIZE / 1024 + "KB");
+        }
+        String url = getUrl_uploadPermMedia(MaterialType.THUMB);
+        JSONObject result = NetUtil.uploadMediaPost(url, file);
+        String mediaId = result.getString("media_id");
+        String imageUrl = result.getString("url");
+        log.debug("perm thumb mediaId :" + mediaId + "; url :" + imageUrl);
+        return new PermImage(mediaId, imageUrl);
+    }
+
+
+
+
+
+
     
-
-
-
-
-
-
 
     /**
      * 上传临时素材
@@ -198,7 +324,7 @@ public class WxMaterialUtil {
             } else {
                 mediaId = NetUtil.uploadMediaPost(url, file).getString("media_id");
             }
-            log.debug(type.getValue() + " mediaId :" + mediaId);
+            log.debug("temp " + type.getValue() + " mediaId :" + mediaId);
         } catch (WxException e) {
             log.warn(e.getMessage());
             throw new WxException(e.getCode(), e.getErrMsg());
@@ -231,17 +357,17 @@ public class WxMaterialUtil {
 
     /**
      * 判断语音文件的播放时间长度（单位：秒）
-     * <p>参考链接 mp3/amr: http://www.cnblogs.com/yoyotl/p/5614530.html</p>
+     * <p>参考链接: http://www.cnblogs.com/yoyotl/p/5614530.html</p>
      *
      * @param file
      * @return
      */
     private static long getVoicePeriod(File file) {
-        String mediaType = getFileSuffix(file).toLowerCase();
+        //MP3File类支持解析的音频类型，另不准确或不支持wma、wav
+        String[] types = {"mp3", "amr"};
         long period = -1;
         try {
-            //语音为mp3和amr格式
-            if ("mp3".equals(mediaType) || "amr".equals(mediaType)) {
+            if (ArrayUtils.contains(types, getFileSuffix(file))) {
                 MP3File mp3 = new MP3File(file);
                 MP3AudioHeader audioHeader = (MP3AudioHeader) mp3.getAudioHeader();
                 period = audioHeader.getTrackLength();
