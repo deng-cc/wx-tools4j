@@ -84,6 +84,30 @@ public class WxMaterialAPI {
      */
     private static String url_uploadPermMedia = "https://api.weixin.qq.com/cgi-bin/material/add_material?access_token=%s&type=%s";
 
+    /**
+     * "获取永久素材"的接口
+     * https协议，POST请求
+     * 参数
+     *   accessToken 接口调用凭证
+     */
+    private static String url_downloadPermMedia = "https://api.weixin.qq.com/cgi-bin/material/get_material?access_token=%s";
+
+    /**
+     * "获取永久素材列表"的接口
+     * https协议，POST请求
+     * 参数
+     *   accessToken 接口调用凭证
+     */
+    private static String url_getPermMediaList = "https://api.weixin.qq.com/cgi-bin/material/batchget_material?access_token=%s";
+
+    /**
+     * "获取素材总数"的接口
+     * https协议，GET请求
+     * 参数
+     *   accessToken 接口调用凭证
+     */
+    private static String url_getPermMediaCount = "https://api.weixin.qq.com/cgi-bin/material/get_materialcount?access_token=%s";
+
 
     public static String getUrl_getTempMediaId(MaterialType type) {
         return String.format(url_uploadTemp, WxConfig.getAccessToken(), type.getValue());
@@ -103,5 +127,17 @@ public class WxMaterialAPI {
 
     public static String getUrl_uploadPermMedia(MaterialType type) {
         return String.format(url_uploadPermMedia, WxConfig.getAccessToken(), type.getValue());
+    }
+
+    public static String getUrl_downloadPermMedia() {
+        return String.format(url_downloadPermMedia, WxConfig.getAccessToken());
+    }
+
+    public static String getUrl_getPermMediaList() {
+        return String.format(url_getPermMediaList, WxConfig.getAccessToken());
+    }
+
+    public static String getUrl_getPermMediaCount() {
+        return String.format(url_getPermMediaCount, WxConfig.getAccessToken());
     }
 }

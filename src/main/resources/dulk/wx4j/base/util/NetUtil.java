@@ -84,6 +84,17 @@ public class NetUtil {
         return resultJSON;
     }
 
+    /**
+     * 以POST请求方式调用微信url接口，以获取对应结果的File
+     * @param url 微信接口
+     * @param content 需要提交的数据
+     * @param file 将写入内容的file
+     * @return
+     */
+    public static File sendRequestPOST(String url, String content, File file) {
+        return sendRequest(url, "POST", content, file);
+    }
+
 
     /**
      * 模拟表单形式，上传form-data中的媒体文件
@@ -94,7 +105,7 @@ public class NetUtil {
      * @return 返回结果的JSONObject
      * @throws Exception
      */
-    public static JSONObject uploadMediaPost(String url, File file, String... fileDesc) throws WxException {
+    public static JSONObject uploadMediaPOST(String url, File file, String... fileDesc) throws WxException {
         BufferedReader reader = null;
         String result = null;
         String line = null;

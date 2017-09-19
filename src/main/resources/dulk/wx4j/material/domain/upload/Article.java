@@ -1,10 +1,10 @@
-package dulk.wx4j.material.domain;
+package dulk.wx4j.material.domain.upload;
 
 
 import com.alibaba.fastjson.annotation.JSONField;
 
 /**
- * 图文消息中文章的实体类
+ * 上传的永久图文消息中文章的实体类
  */
 public class Article {
 

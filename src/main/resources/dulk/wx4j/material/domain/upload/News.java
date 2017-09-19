@@ -1,12 +1,13 @@
-package dulk.wx4j.material.domain;
+package dulk.wx4j.material.domain.upload;
 
 
 import com.alibaba.fastjson.annotation.JSONField;
+import dulk.wx4j.material.domain.upload.Article;
 
 import java.util.List;
 
 /**
- * 图文消息的实体类
+ * 上传的永久图文消息的实体类
  */
 public class News {
 

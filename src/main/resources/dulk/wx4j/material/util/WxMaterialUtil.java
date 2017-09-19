@@ -4,8 +4,11 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import dulk.wx4j.base.exception.WxException;
 import dulk.wx4j.base.util.NetUtil;
-import dulk.wx4j.material.domain.News;
-import dulk.wx4j.material.domain.PermImage;
+import dulk.wx4j.material.domain.download.ArticleList;
+import dulk.wx4j.material.domain.get.MediaList;
+import dulk.wx4j.material.domain.get.NewsList;
+import dulk.wx4j.material.domain.upload.PermImage;
+import dulk.wx4j.material.domain.upload.News;
 import dulk.wx4j.material.exception.MaterialException;
 import dulk.wx4j.material.api.MaterialType;
 import static dulk.wx4j.material.api.WxMaterialAPI.*;
@@ -118,48 +121,7 @@ public class WxMaterialUtil {
         return uploadTemp(file, MaterialType.THUMB);
     }
 
-    /**
-     * 下载临时素材
-     * <p>封装的File文件类的文件类型，必须和mediaId对应的素材类型相同，否则很容易抛出异常</p>
-     * <p>如new File("C:\\temp.mp4")，则mediaId必须对应的是视频素材，否则容易抛出WxException，或因为json解析而抛出JSONException</p>
-     *
-     * @param file    将要写入内容的File类
-     * @param mediaId 临时素材的mediaId
-     * @return 下载文件的File类
-     * @throws WxException
-     */
-    public static File downloadTemp(File file, String mediaId) {
-        String url = getUrl_downloadTempMedia(mediaId);
-        //视频不支持https下载，NetUtil中均为https协议请求，故此处选择http协议
-        if (isAllowedType(ALLOWED_TEMP_VIDEO_TYPE, file)) {
-            try {
-                url = NetUtil.sendRequestGET(url).getString("video_url");
-                URL urlObj = new URL(url);
-                HttpURLConnection coon = (HttpURLConnection) urlObj.openConnection();
-                InputStream is = coon.getInputStream();
-                OutputStream os = new FileOutputStream(file);
-                int size = -1;
-                byte[] cache = new byte[1024];
-                while ((size = is.read(cache)) != -1) {
-                    os.write(cache, 0, size);
-                }
-                os.close();
-                is.close();
-                coon.disconnect();
 
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (WxException e) {
-                e.printStackTrace();
-            }
-            return file;
-
-        } else {
-            return NetUtil.sendRequestGET(url, file);
-        }
-    }
 
 
     /**
@@ -192,7 +154,7 @@ public class WxMaterialUtil {
                     + ALLOWED_PERM_NEWSIMAGE_SIZE / 1024 / 1024 + "M");
         }
         String url = getUrl_uploadPermNewsImage();
-        String imageUrl = NetUtil.uploadMediaPost(url, file).getString("url");
+        String imageUrl = NetUtil.uploadMediaPOST(url, file).getString("url");
         log.debug("perm newsImage url :" + imageUrl);
         return imageUrl;
     }
@@ -215,7 +177,7 @@ public class WxMaterialUtil {
                     + ALLOWED_PERM_IMAGE_SIZE / 1024 / 1024 + "M");
         }
         String url = getUrl_uploadPermMedia(MaterialType.IMAGE);
-        JSONObject result = NetUtil.uploadMediaPost(url, file);
+        JSONObject result = NetUtil.uploadMediaPOST(url, file);
         String mediaId = result.getString("media_id");
         String imageUrl = result.getString("url");
         log.debug("perm image mediaId :" + mediaId + "; url :" + imageUrl);
@@ -244,7 +206,7 @@ public class WxMaterialUtil {
             throw new MaterialException("上传永久语音超过时长，播放长度不超过" + ALLOWED_PERM_VOICE_TIME + "s");
         }
         String url = getUrl_uploadPermMedia(MaterialType.VOICE);
-        String mediaId = NetUtil.uploadMediaPost(url, file).getString("media_id");
+        String mediaId = NetUtil.uploadMediaPOST(url, file).getString("media_id");
         log.debug("perm voice mediaId :" + mediaId);
         return mediaId;
     }
@@ -253,7 +215,7 @@ public class WxMaterialUtil {
      * 上传永久视频素材
      *
      * @param file
-     * @param title 视频标题
+     * @param title        视频标题
      * @param introduction 视频描述（简介）
      * @return 永久视频素材的mediaId
      * @throws MaterialException
@@ -270,7 +232,7 @@ public class WxMaterialUtil {
         }
         String url = getUrl_uploadPermMedia(MaterialType.VIDEO);
         String content = String.format("{\"title\":\"%s\",\"introduction\":\"%s\"}", title, introduction);
-        String mediaId = NetUtil.uploadMediaPost(url, file, content).getString("media_id");
+        String mediaId = NetUtil.uploadMediaPOST(url, file, content).getString("media_id");
         log.debug("perm video mediaId :" + mediaId);
         return mediaId;
     }
@@ -293,11 +255,180 @@ public class WxMaterialUtil {
                     + ALLOWED_PERM_THUMB_SIZE / 1024 + "KB");
         }
         String url = getUrl_uploadPermMedia(MaterialType.THUMB);
-        JSONObject result = NetUtil.uploadMediaPost(url, file);
+        JSONObject result = NetUtil.uploadMediaPOST(url, file);
         String mediaId = result.getString("media_id");
         String imageUrl = result.getString("url");
         log.debug("perm thumb mediaId :" + mediaId + "; url :" + imageUrl);
         return new PermImage(mediaId, imageUrl);
+    }
+
+    /**
+     * 下载临时素材
+     * <p>封装的File文件类的文件类型，必须和mediaId对应的素材类型相同，否则很容易抛出异常</p>
+     * <p>如new File("C:\\temp.mp4")，则mediaId必须对应的是视频素材，否则容易抛出WxException，或因为json解析而抛出JSONException</p>
+     *
+     * @param mediaId 临时素材的mediaId
+     * @param file    将要写入内容的File类
+     * @return 下载文件的File类
+     * @throws WxException
+     */
+    public static File downloadTemp(String mediaId, File file) throws WxException {
+        String url = getUrl_downloadTempMedia(mediaId);
+        //视频不支持https下载，NetUtil中均为https协议请求，故此处选择http协议
+        if (isAllowedType(ALLOWED_TEMP_VIDEO_TYPE, file)) {
+            try {
+                url = NetUtil.sendRequestGET(url).getString("video_url");
+                URL urlObj = new URL(url);
+                HttpURLConnection coon = (HttpURLConnection) urlObj.openConnection();
+                InputStream is = coon.getInputStream();
+                OutputStream os = new FileOutputStream(file);
+                int size = -1;
+                byte[] cache = new byte[1024];
+                while ((size = is.read(cache)) != -1) {
+                    os.write(cache, 0, size);
+                }
+                os.close();
+                is.close();
+                coon.disconnect();
+
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return file;
+
+        } else {
+            return NetUtil.sendRequestGET(url, file);
+        }
+    }
+
+
+    /**
+     * 下载永久图文消息素材
+     *
+     * @param mediaId 图文消息素材的mediaId
+     * @return 永久图文消息素材的封装类
+     * @throws WxException
+     */
+    public static ArticleList downloadPermNews(String mediaId) throws WxException {
+        String url = getUrl_downloadPermMedia();
+        String content = String.format("{\"media_id\":\"%s\"}", mediaId);
+        JSONObject resultJSON = NetUtil.sendRequestPOST(url, content);
+        return resultJSON.toJavaObject(ArticleList.class);
+    }
+
+    //todo 待测试
+    /**
+     * 下载其他永久素材
+     *
+     * @param mediaId 永久素材的mediaId
+     * @param file    需要写入内容的File类
+     * @return 不同的素材返回的字符串代表含义不同
+     *         视频素材：返回视频素材的JSON字符串，同时视频内容写入到参数file中
+     *         其他素材：如图片、语音、缩略图等，返回其文件的绝对路径，同时内容写入到参数file中
+     */
+    public static String downloadPermMedia(String mediaId, File file) throws WxException {
+        String url = getUrl_downloadPermMedia();
+        String content = String.format("{\"media_id\":\"%s\"}", mediaId);
+        //视频素材
+        if (isAllowedType(ALLOWED_PERM_VIDEO_TYPE, file)) {
+            try {
+                JSONObject resultJSON = NetUtil.sendRequestPOST(url, content);
+                url = resultJSON.getString("down_url");
+                URL urlObj = new URL(url);
+                HttpURLConnection coon = (HttpURLConnection) urlObj.openConnection();
+                InputStream is = coon.getInputStream();
+                OutputStream os = new FileOutputStream(file);
+                int size = -1;
+                byte[] cache = new byte[1024];
+                while ((size = is.read(cache)) != -1) {
+                    os.write(cache, 0, size);
+                }
+                os.close();
+                is.close();
+                coon.disconnect();
+                return resultJSON.toJSONString();
+
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        //其他素材
+        if (isAllowedType(ALLOWED_PERM_NEWSIMAGE_TYPE, file) || isAllowedType(ALLOWED_PERM_IMAGE_TYPE, file)
+                || isAllowedType(ALLOWED_PERM_THUMB_TYPE, file) || isAllowedType(ALLOWED_PERM_VOICE_TYPE, file)) {
+            NetUtil.sendRequestPOST(url, content, file);
+            try {
+                return file.getCanonicalPath();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
+    //todo 待测试
+    /**
+     * 获取永久图文素材列表
+     *
+     * @param startIndex 从全部素材的startIndex位置开始，0表示从第一个素材开始返回
+     * @param count      返回素材的数量，取值在1-20之间
+     * @return
+     */
+    public static NewsList getPermNewsList(int startIndex, int count) throws MaterialException, WxException {
+        if (count < 0 || count > 20) {
+            throw new MaterialException("返回素材的数量指定超过限制，取值只能在1-20之间");
+        }
+        String url = getUrl_getPermMediaList();
+        String postContent = String.format("{\"type\":\"news\",\"offset\":\"%d\",\"count\":\"%d\"}", startIndex, count);
+        return NetUtil.sendRequestPOST(url, postContent).toJavaObject(NewsList.class);
+    }
+
+    //todo 待测试，注意返回参数可能比文档提供的参数更多
+    /**
+     * 获取永久其他素材列表
+     *
+     * @param type       其他媒体素材类型
+     * @param startIndex 从全部素材的startIndex位置开始，0表示从第一个素材开始返回
+     * @param count      返回素材的数量，取值在1-20之间
+     * @return
+     * @throws MaterialException
+     * @throws WxException
+     */
+    public static MediaList getPermMediaList(MaterialType type, int startIndex, int count) throws MaterialException, WxException {
+        if (count < 0 || count > 20) {
+            throw new MaterialException("返回素材的数量指定超过限制，取值只能在1-20之间");
+        }
+        String url = getUrl_getPermMediaList();
+        String postContent = String.format("{\"type\":\"%s\",\"offset\":\"%d\",\"count\":\"%d\"}", type.getValue(), startIndex, count);
+        return NetUtil.sendRequestPOST(url, postContent).toJavaObject(MediaList.class);
+    }
+
+    /**
+     * 获取永久图文消息素材的总数
+     * @return 永久图文消息素材的总数
+     * @throws WxException
+     */
+    public static int getPermNewsCount() throws WxException {
+        String type = "news";
+        return Integer.valueOf(getPermCount(type));
+    }
+
+    /**
+     * 获取其他永久类型素材的总数
+     *
+     * @param type voice/video/image，没有thumb
+     * @return 其他永久素材总数
+     * @throws WxException
+     */
+    public static int getPermMediaCount(MaterialType type) throws WxException, MaterialException {
+        if (MaterialType.THUMB == type) {
+            throw new MaterialException("获取其他类型素材总数，不包括缩略图类型");
+        }
+        String typeStr = type.getValue();
+        return Integer.valueOf(getPermCount(typeStr));
     }
 
 
@@ -305,7 +436,21 @@ public class WxMaterialUtil {
 
 
 
-    
+
+
+
+
+    /**
+     * 获取指定素材类型的总数
+     *
+     * @param type voice/video/image/news
+     * @return
+     * @throws WxException
+     */
+    private static String getPermCount(String type) throws WxException {
+        String url = getUrl_getPermMediaCount();
+        return NetUtil.sendRequestGET(url).getString(type + "_count");
+    }
 
     /**
      * 上传临时素材
@@ -320,9 +465,9 @@ public class WxMaterialUtil {
         String url = getUrl_getTempMediaId(type);
         try {
             if (MaterialType.THUMB == type) {
-                mediaId = NetUtil.uploadMediaPost(url, file).getString("thumb_media_id");
+                mediaId = NetUtil.uploadMediaPOST(url, file).getString("thumb_media_id");
             } else {
-                mediaId = NetUtil.uploadMediaPost(url, file).getString("media_id");
+                mediaId = NetUtil.uploadMediaPOST(url, file).getString("media_id");
             }
             log.debug("temp " + type.getValue() + " mediaId :" + mediaId);
         } catch (WxException e) {
@@ -384,7 +529,6 @@ public class WxMaterialUtil {
         log.debug("media duration : " + period + " seconds");
         return period;
     }
-
 
 
 }
