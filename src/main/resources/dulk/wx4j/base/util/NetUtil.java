@@ -11,6 +11,7 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -43,14 +44,12 @@ public class NetUtil {
      */
     public static JSONObject sendRequestGET(String url) throws WxException {
         String result = sendRequest(url, "GET", null);
-
         JSONObject resultJSON = JSON.parseObject(result);
         String errorCode = resultJSON.getString("errcode");
         String errorMsg = resultJSON.getString("errmsg");
         if (errorCode != null && !"0".equals(errorCode)) {
             throw new WxException(errorCode, errorMsg);
         }
-
         return resultJSON;
     }
 
@@ -58,12 +57,10 @@ public class NetUtil {
      * 以GET请求方式调用微信url接口，以获取对应结果的File
      * @param url 微信接口
      * @param file 将写入内容的file
-     * @return
      */
-    public static File sendRequestGET(String url, File file) {
-        return sendRequest(url, "GET", null, file);
+    public static void sendRequestGET(String url, File file) throws WxException {
+        sendRequest(url, "GET", null, file);
     }
-
 
     /**
      * 以POST请求方式调用微信url接口，以获取对应结果的字符串
@@ -73,14 +70,12 @@ public class NetUtil {
      */
     public static JSONObject sendRequestPOST(String url, String content) throws WxException {
         String result = sendRequest(url, "POST", content);
-
         JSONObject resultJSON = JSON.parseObject(result);
         String errorCode = resultJSON.getString("errcode");
         String errorMsg = resultJSON.getString("errmsg");
         if (errorCode != null && !"0".equals(errorCode)) {
             throw new WxException(errorCode, errorMsg);
         }
-
         return resultJSON;
     }
 
@@ -89,12 +84,197 @@ public class NetUtil {
      * @param url 微信接口
      * @param content 需要提交的数据
      * @param file 将写入内容的file
-     * @return
      */
-    public static File sendRequestPOST(String url, String content, File file) {
-        return sendRequest(url, "POST", content, file);
+    public static void sendRequestPOST(String url, String content, File file) throws WxException {
+        sendRequest(url, "POST", content, file);
     }
 
+
+
+
+
+    /**
+     * 发送一个https请求并获取结果
+     * <p>该方法针对于微信中对于大部分官方提供接口的访问，以得到期望数据</p>
+     *
+     * @param url 请求地址url
+     * @param requestMethod 请求方法GET/POST
+     * @param outputStr 需要额外提交的数据，没有的话填null
+     * @return response返回结果的字符串
+     */
+    private static String sendRequest(String url, String requestMethod, String outputStr) {
+        outputStr = outputStr == null || outputStr.equals("") ? null : outputStr;
+        StringBuffer buffer = new StringBuffer();
+        //创建SSLContext对象，并使用我们指定的信任管理器初始化
+        TrustManager[] trustManager = {new MyX509TrustManager()};
+        SSLContext sslContext = null;
+        String result = null;
+
+        try {
+            sslContext = SSLContext.getInstance("SSL", "SunJSSE");
+            sslContext.init(null, trustManager, new SecureRandom());
+            //从上述SSLContext对象中得到SSLSocketFactory对象
+            SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
+            URL requestUrl = new URL(url);
+            HttpsURLConnection httpUrlConn = (HttpsURLConnection) requestUrl.openConnection();
+            httpUrlConn.setSSLSocketFactory(sslSocketFactory);
+
+            httpUrlConn.setDoOutput(true);
+            httpUrlConn.setDoInput(true);
+            httpUrlConn.setUseCaches(false);
+
+            //设置请求方式（GET/POST）
+            httpUrlConn.setRequestMethod(requestMethod.toUpperCase());
+
+            if (requestMethod.equals("GET")) {
+                httpUrlConn.connect();
+            }
+
+            //当有数据需要提交时
+            if (outputStr != null) {
+                OutputStream outputStream = httpUrlConn.getOutputStream();
+                //注意编码格式，防止中文乱码
+                outputStream.write(outputStr.getBytes("UTF-8"));
+                outputStream.close();
+            }
+
+            //将返回的输入流转换为字符串
+            InputStream inputStream = httpUrlConn.getInputStream();
+            InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
+            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+
+            String str = null;
+            while ((str = bufferedReader.readLine()) != null) {
+                buffer.append(str);
+            }
+            result = buffer.toString();
+
+            //关闭资源
+            bufferedReader.close();
+            inputStreamReader.close();
+            inputStream.close();
+            inputStream = null;
+            httpUrlConn.disconnect();
+
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (NoSuchProviderException e) {
+            e.printStackTrace();
+        } catch (KeyManagementException e) {
+            e.printStackTrace();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        log.debug(result);
+        return result;
+    }
+
+    /**
+     * 发送一个https请求并获取结果
+     * <p>该方法针对于微信中对于媒体文件下载接口的访问，以得到期望数据</p>
+     *
+     * @param url 请求地址url
+     * @param requestMethod 请求方法GET/POST
+     * @param outputStr 需要额外提交的数据，没有的话填null
+     * @param file 期望获取文件的File类
+     */
+    private static void sendRequest(String url, String requestMethod, String outputStr, File file) throws WxException {
+        outputStr = outputStr == null || outputStr.equals("") ? null : outputStr;
+        StringBuffer buffer = new StringBuffer();
+        //创建SSLContext对象，并使用我们指定的信任管理器初始化
+        TrustManager[] trustManager = {new MyX509TrustManager()};
+        SSLContext sslContext = null;
+        String result = null;
+
+        try {
+            sslContext = SSLContext.getInstance("SSL", "SunJSSE");
+            sslContext.init(null, trustManager, new SecureRandom());
+            //从上述SSLContext对象中得到SSLSocketFactory对象
+            SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
+            URL requestUrl = new URL(url);
+            HttpsURLConnection httpUrlConn = (HttpsURLConnection) requestUrl.openConnection();
+            httpUrlConn.setSSLSocketFactory(sslSocketFactory);
+
+            httpUrlConn.setDoOutput(true);
+            httpUrlConn.setDoInput(true);
+            httpUrlConn.setUseCaches(false);
+
+            //设置请求方式（GET/POST）
+            httpUrlConn.setRequestMethod(requestMethod.toUpperCase());
+
+            if ("GET".equals(requestMethod)) {
+                httpUrlConn.connect();
+            }
+
+            //当有数据需要提交时
+            if (outputStr != null) {
+                OutputStream outputStream = httpUrlConn.getOutputStream();
+                //注意编码格式，防止中文乱码
+                outputStream.write(outputStr.getBytes("UTF-8"));
+                outputStream.close();
+            }
+
+            //通过http请求头内容判断流内容，是业务错误代码还是文件
+            String contentType = httpUrlConn.getContentType();
+            InputStream is = httpUrlConn.getInputStream();
+            //如果输入流是微信返回的业务错误代码
+            if ( contentType != null && contentType.contains("application/json")) {
+                InputStreamReader inputStreamReader = new InputStreamReader(is, "UTF-8");
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                String str = null;
+                while ((str = bufferedReader.readLine()) != null) {
+                    buffer.append(str);
+                }
+                result = buffer.toString();
+                JSONObject resultJSON = JSON.parseObject(result);
+                String errorCode = resultJSON.getString("errcode");
+                String errorMsg = resultJSON.getString("errmsg");
+                if (errorCode != null && !"0".equals(errorCode)) {
+                    throw new WxException(errorCode, errorMsg);
+                }
+
+            } else {
+                //如果输入流返回的是文件流
+                String fileName = file.getName();
+                String fileType = contentType == null ? null : contentType.substring(contentType.lastIndexOf("/") + 1);
+                String suffix = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
+                if (fileType != null && !fileType.equals(suffix)) {
+                    log.warn("mediaId对应的媒体类型（" + fileType + "）和file封装的文件类型（" + suffix + "）不符，" +
+                            "写入的file可能无法打开");
+                }
+
+                //获取输入流，转化为文件
+                OutputStream os = new FileOutputStream(file);
+                int size = -1;
+                byte[] cache = new byte[1024];
+                while ((size = is.read(cache)) != -1) {
+                    os.write(cache, 0, size);
+                }
+                os.close();
+                os = null;
+            }
+
+            //关闭资源
+            is.close();
+            is = null;
+            httpUrlConn.disconnect();
+            log.debug(file.getCanonicalFile());
+
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (NoSuchProviderException e) {
+            e.printStackTrace();
+        } catch (KeyManagementException e) {
+            e.printStackTrace();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     /**
      * 模拟表单形式，上传form-data中的媒体文件
@@ -192,172 +372,5 @@ public class NetUtil {
         }
         return resultJSON;
     }
-
-
-    /**
-     * 发送一个https请求并获取结果
-     * <p>该方法针对于微信中对于大部分官方提供接口的访问，以得到期望数据</p>
-     *
-     * @param url 请求地址url
-     * @param requestMethod 请求方法GET/POST
-     * @param outputStr 需要额外提交的数据，没有的话填null
-     * @return response返回结果的字符串
-     */
-    private static String sendRequest(String url, String requestMethod, String outputStr) {
-        outputStr = outputStr == null || outputStr.equals("") ? null : outputStr;
-        StringBuffer buffer = new StringBuffer();
-        //创建SSLContext对象，并使用我们指定的信任管理器初始化
-        TrustManager[] trustManager = {new MyX509TrustManager()};
-        SSLContext sslContext = null;
-        String result = null;
-
-        try {
-            sslContext = SSLContext.getInstance("SSL", "SunJSSE");
-            sslContext.init(null, trustManager, new SecureRandom());
-            //从上述SSLContext对象中得到SSLSocketFactory对象
-            SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
-            URL requestUrl = new URL(url);
-            HttpsURLConnection httpUrlConn = (HttpsURLConnection) requestUrl.openConnection();
-            httpUrlConn.setSSLSocketFactory(sslSocketFactory);
-
-            httpUrlConn.setDoOutput(true);
-            httpUrlConn.setDoInput(true);
-            httpUrlConn.setUseCaches(false);
-
-            //设置请求方式（GET/POST）
-            httpUrlConn.setRequestMethod(requestMethod.toUpperCase());
-
-            if (requestMethod.equals("GET")) {
-                httpUrlConn.connect();
-            }
-
-            //当有数据需要提交时
-            if (outputStr != null) {
-                OutputStream outputStream = httpUrlConn.getOutputStream();
-                //注意编码格式，防止中文乱码
-                outputStream.write(outputStr.getBytes("UTF-8"));
-                outputStream.close();
-            }
-
-            //将返回的输入流转换为字符串
-            InputStream inputStream = httpUrlConn.getInputStream();
-            InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
-            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-
-            String str = null;
-            while ((str = bufferedReader.readLine()) != null) {
-                buffer.append(str);
-            }
-            result = buffer.toString();
-
-            //关闭资源
-            bufferedReader.close();
-            inputStreamReader.close();
-            inputStream.close();
-            inputStream = null;
-            httpUrlConn.disconnect();
-
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (NoSuchProviderException e) {
-            e.printStackTrace();
-        } catch (KeyManagementException e) {
-            e.printStackTrace();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        log.debug(result);
-        return result;
-    }
-
-
-    /**
-     * 发送一个https请求并获取结果
-     * <p>该方法针对于微信中对于媒体文件下载接口的访问，以得到期望数据</p>
-     *
-     * @param url 请求地址url
-     * @param requestMethod 请求方法GET/POST
-     * @param outputStr 需要额外提交的数据，没有的话填null
-     * @param file 期望获取文件的File类
-     * @return 获取的文件
-     */
-    private static File sendRequest(String url, String requestMethod, String outputStr, File file) {
-        outputStr = outputStr == null || outputStr.equals("") ? null : outputStr;
-        //创建SSLContext对象，并使用我们指定的信任管理器初始化
-        TrustManager[] trustManager = {new MyX509TrustManager()};
-        SSLContext sslContext = null;
-
-        try {
-            sslContext = SSLContext.getInstance("SSL", "SunJSSE");
-            sslContext.init(null, trustManager, new SecureRandom());
-            //从上述SSLContext对象中得到SSLSocketFactory对象
-            SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
-            URL requestUrl = new URL(url);
-            HttpsURLConnection httpUrlConn = (HttpsURLConnection) requestUrl.openConnection();
-            httpUrlConn.setSSLSocketFactory(sslSocketFactory);
-
-            httpUrlConn.setDoOutput(true);
-            httpUrlConn.setDoInput(true);
-            httpUrlConn.setUseCaches(false);
-
-            //设置请求方式（GET/POST）
-            httpUrlConn.setRequestMethod(requestMethod.toUpperCase());
-
-            if (requestMethod.equals("GET")) {
-                httpUrlConn.connect();
-            }
-
-            //当有数据需要提交时
-            if (outputStr != null) {
-                OutputStream outputStream = httpUrlConn.getOutputStream();
-                //注意编码格式，防止中文乱码
-                outputStream.write(outputStr.getBytes("UTF-8"));
-                outputStream.close();
-            }
-
-            String contentType = httpUrlConn.getContentType();
-            String fileType = contentType == null ? null : contentType.substring(contentType.lastIndexOf("/") + 1);
-            String fileName = file.getName();
-            String suffix = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
-            if (fileType != null && !fileType.equals(suffix)) {
-                log.warn("mediaId对应的媒体类型（" + fileType + "）和file封装的文件类型（" + suffix + "）不符，" +
-                        "写入的file可能无法打开");
-            }
-
-            //获取输入流，转化为文件
-            InputStream is = httpUrlConn.getInputStream();
-            OutputStream os = new FileOutputStream(file);
-            int size = -1;
-            byte[] cache = new byte[1024];
-            while ((size = is.read(cache)) != -1) {
-                os.write(cache, 0, size);
-            }
-
-            //关闭资源
-            os.close();
-            is.close();
-            os = null;
-            is = null;
-            httpUrlConn.disconnect();
-            log.debug(file.getCanonicalFile());
-
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (NoSuchProviderException e) {
-            e.printStackTrace();
-        } catch (KeyManagementException e) {
-            e.printStackTrace();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return file;
-    }
-
 
 }

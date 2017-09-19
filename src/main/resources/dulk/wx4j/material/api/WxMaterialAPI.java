@@ -108,6 +108,22 @@ public class WxMaterialAPI {
      */
     private static String url_getPermMediaCount = "https://api.weixin.qq.com/cgi-bin/material/get_materialcount?access_token=%s";
 
+    /**
+     * "删除永久素材"的接口
+     * https协议，POST请求
+     * 参数
+     *   accessToken 接口调用凭证
+     */
+    private static String url_deletePermMedia = "https://api.weixin.qq.com/cgi-bin/material/del_material?access_token=%s";
+
+    /**
+     * "修改永久图文素材"的接口
+     * https协议，POST接口
+     * 参数
+     *   accessToken 接口调用凭证
+     */
+    private static String url_updatePermNews = "https://api.weixin.qq.com/cgi-bin/material/update_news?access_token=%s";
+
 
     public static String getUrl_getTempMediaId(MaterialType type) {
         return String.format(url_uploadTemp, WxConfig.getAccessToken(), type.getValue());
@@ -139,5 +155,13 @@ public class WxMaterialAPI {
 
     public static String getUrl_getPermMediaCount() {
         return String.format(url_getPermMediaCount, WxConfig.getAccessToken());
+    }
+
+    public static String getUrl_deletePermMedia() {
+        return String.format(url_deletePermMedia, WxConfig.getAccessToken());
+    }
+
+    public static String getUrl_updatePermNews() {
+        return String.format(url_updatePermNews, WxConfig.getAccessToken());
     }
 }

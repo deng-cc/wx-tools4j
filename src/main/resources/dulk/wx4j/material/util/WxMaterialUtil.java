@@ -7,6 +7,8 @@ import dulk.wx4j.base.util.NetUtil;
 import dulk.wx4j.material.domain.download.ArticleList;
 import dulk.wx4j.material.domain.get.MediaList;
 import dulk.wx4j.material.domain.get.NewsList;
+import dulk.wx4j.material.domain.upload.Article;
+import dulk.wx4j.material.domain.upload.NewArticle;
 import dulk.wx4j.material.domain.upload.PermImage;
 import dulk.wx4j.material.domain.upload.News;
 import dulk.wx4j.material.exception.MaterialException;
@@ -299,7 +301,8 @@ public class WxMaterialUtil {
             return file;
 
         } else {
-            return NetUtil.sendRequestGET(url, file);
+            NetUtil.sendRequestGET(url, file);
+            return file;
         }
     }
 
@@ -318,7 +321,6 @@ public class WxMaterialUtil {
         return resultJSON.toJavaObject(ArticleList.class);
     }
 
-    //todo 待测试
     /**
      * 下载其他永久素材
      *
@@ -328,7 +330,7 @@ public class WxMaterialUtil {
      *         视频素材：返回视频素材的JSON字符串，同时视频内容写入到参数file中
      *         其他素材：如图片、语音、缩略图等，返回其文件的绝对路径，同时内容写入到参数file中
      */
-    public static String downloadPermMedia(String mediaId, File file) throws WxException {
+    public static String downloadPermMedia(String mediaId, File file) throws WxException, MaterialException {
         String url = getUrl_downloadPermMedia();
         String content = String.format("{\"media_id\":\"%s\"}", mediaId);
         //视频素材
@@ -357,7 +359,7 @@ public class WxMaterialUtil {
             }
         }
         //其他素材
-        if (isAllowedType(ALLOWED_PERM_NEWSIMAGE_TYPE, file) || isAllowedType(ALLOWED_PERM_IMAGE_TYPE, file)
+        else if (isAllowedType(ALLOWED_PERM_NEWSIMAGE_TYPE, file) || isAllowedType(ALLOWED_PERM_IMAGE_TYPE, file)
                 || isAllowedType(ALLOWED_PERM_THUMB_TYPE, file) || isAllowedType(ALLOWED_PERM_VOICE_TYPE, file)) {
             NetUtil.sendRequestPOST(url, content, file);
             try {
@@ -365,11 +367,12 @@ public class WxMaterialUtil {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        } else {
+            throw new MaterialException("File文件的类型不符，未在指定的文件类型范围内");
         }
         return null;
     }
 
-    //todo 待测试
     /**
      * 获取永久图文素材列表
      *
@@ -386,11 +389,10 @@ public class WxMaterialUtil {
         return NetUtil.sendRequestPOST(url, postContent).toJavaObject(NewsList.class);
     }
 
-    //todo 待测试，注意返回参数可能比文档提供的参数更多
     /**
      * 获取永久其他素材列表
      *
-     * @param type       其他媒体素材类型
+     * @param type       其他媒体素材类型，voice/video/image，不包括thumb
      * @param startIndex 从全部素材的startIndex位置开始，0表示从第一个素材开始返回
      * @param count      返回素材的数量，取值在1-20之间
      * @return
@@ -401,6 +403,9 @@ public class WxMaterialUtil {
         if (count < 0 || count > 20) {
             throw new MaterialException("返回素材的数量指定超过限制，取值只能在1-20之间");
         }
+        if (MaterialType.THUMB == type) {
+            throw new MaterialException("合法类型不包括缩略图，无法获取缩略图类型");
+        }
         String url = getUrl_getPermMediaList();
         String postContent = String.format("{\"type\":\"%s\",\"offset\":\"%d\",\"count\":\"%d\"}", type.getValue(), startIndex, count);
         return NetUtil.sendRequestPOST(url, postContent).toJavaObject(MediaList.class);
@@ -408,6 +413,7 @@ public class WxMaterialUtil {
 
     /**
      * 获取永久图文消息素材的总数
+     *
      * @return 永久图文消息素材的总数
      * @throws WxException
      */
@@ -419,21 +425,45 @@ public class WxMaterialUtil {
     /**
      * 获取其他永久类型素材的总数
      *
-     * @param type voice/video/image，没有thumb
+     * @param type 其他永久素材类型voice/video/image，没有thumb
      * @return 其他永久素材总数
      * @throws WxException
      */
     public static int getPermMediaCount(MaterialType type) throws WxException, MaterialException {
         if (MaterialType.THUMB == type) {
-            throw new MaterialException("获取其他类型素材总数，不包括缩略图类型");
+            throw new MaterialException("合法类型不包括缩略图，无法获取缩略图类型");
         }
         String typeStr = type.getValue();
         return Integer.valueOf(getPermCount(typeStr));
     }
 
+    /**
+     * 删除永久素材
+     *
+     * @param mediaId 永久素材的媒体id
+     * @throws WxException
+     */
+    public static void deletePermMedia(String mediaId) throws WxException {
+        String url = getUrl_deletePermMedia();
+        String postContent = String.format("{\"media_id\":\"%s\"}", mediaId);
+        NetUtil.sendRequestPOST(url, postContent);
+    }
 
-
-
+    /**
+     * 修改更新永久图文素材
+     * <p>一条图文消息有多条文章，该方法仅针对mediaId对应图文消息中指定index的文章做修改处理</p>
+     * <p>这里的参数，封装类Article和上传永久图文素材中的Article是一样的</p>
+     *
+     * @param mediaId 图文消息对应的媒体id
+     * @param index 要更新的文章在图文消息中的索引位置，第一篇为0
+     * @param article 新的文章
+     */
+    public static void updatePermNews(String mediaId, int index, Article article) throws WxException {
+        String url = getUrl_updatePermNews();
+        NewArticle newArticle = new NewArticle(mediaId, index, article);
+        String postContent = JSON.toJSONString(newArticle);
+        NetUtil.sendRequestPOST(url, postContent);
+    }
 
 
 
