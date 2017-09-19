@@ -341,6 +341,10 @@
 		<code>40113</code>
 		<text>不支持的文件类型</text>
 	</error>
+    <error>
+		<code>40114</code>
+		<text>无效的索引值</text>
+	</error>
 	<error>
 		<code>40104</code>
 		<text>创建子商户时填的类目id不对</text>
