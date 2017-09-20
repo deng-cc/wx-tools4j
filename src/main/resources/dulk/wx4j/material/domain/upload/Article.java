@@ -4,7 +4,10 @@ package dulk.wx4j.material.domain.upload;
 import com.alibaba.fastjson.annotation.JSONField;
 
 /**
- * 上传的永久图文消息中文章的实体类
+ * 上传永久图文消息的参数中，文章参数的实体类
+ * <p>
+ * 该类最终封装为List作为同包中News图文消息封装类的属性
+ * </p>
  */
 public class Article {
 
@@ -18,33 +21,39 @@ public class Article {
 
     /**
      * 封面素材id
-     * <p>必须为永久素材id</p>
+     * <p>
+     * 必须为永久素材id
+     * </p>
      */
     @JSONField(name = "thumb_media_id")
     private String thumb_mediaId;
 
     /**
      * 是否显示封面图片
-     * <p>这里是指是否将封面图片在文章内容中也显示出来</p>
-     * <p>1为显示，0为不显示</p>
+     * <p>
+     * 这里是指是否将封面图片在文章内容中也显示出来。1为显示，0为不显示
+     * </p>
      */
     @JSONField(name = "show_cover_pic")
     private String showCover;
 
     /**
      * 图文消息内容
-     * <p>支持HTML，必须少于2w字符，小于1m，会过滤js和外部图片url，图片只能使用"上传图文消息内图片接口"获取的url</p>
+     * <p>
+     * 支持HTML，必须少于2w字符，小于1m，会过滤js和外部图片url，图片只能使用"上传图文消息内图片接口"获取的url
+     * </p>
      */
     @JSONField(name = "content")
     private String content;
 
     /**
      * 原文地址
-     * <p>点"阅读原文"后的url</p>
+     * <p>
+     * 点"阅读原文"后的url
+     * </p>
      */
     @JSONField(name = "content_source_url")
     private String contentSrcUrl;
-
 
 
     //非必需参数
@@ -57,7 +66,9 @@ public class Article {
 
     /**
      * 摘要
-     * <p>不填则默认抓取正文前64个字</p>
+     * <p>
+     * 不填则默认抓取正文前64个字
+     * </p>
      */
     @JSONField(name = "digest")
     private String digest;

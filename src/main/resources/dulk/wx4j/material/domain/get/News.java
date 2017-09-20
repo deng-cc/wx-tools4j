@@ -5,7 +5,10 @@ import com.alibaba.fastjson.annotation.JSONField;
 
 
 /**
- * 获取永久图文消息素材的图文消息实体类
+ * 获取永久图文消息素材列表的图文消息封装类
+ * <p>
+ * 该类是获取永久图文消息素材列表的信息中，图文消息集合的封装类，并最终封装为List作为同包中NewsList类的属性
+ * </p>
  */
 public class News {
 

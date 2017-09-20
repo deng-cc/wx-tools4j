@@ -7,7 +7,7 @@ import dulk.wx4j.material.domain.upload.Article;
 import java.util.List;
 
 /**
- * 上传的永久图文消息的实体类
+ * 上传的永久图文消息的参数的封装类
  */
 public class News {
 

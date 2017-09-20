@@ -3,20 +3,25 @@ package dulk.wx4j.base.domain.message;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
- * Image.
- *
- * @author Dulk
- * @version 20170906
- * @date 17-9-6
+ * 微信交互的响应视频参数的封装类
  */
 public class Video {
 
+    /**
+     * 视频媒体id
+     */
     @XStreamAlias("MediaId")
     private String mediaId;
 
+    /**
+     * 视频标题
+     */
     @XStreamAlias("Title")
     private String title;
 
+    /**
+     * 视频描述
+     */
     @XStreamAlias("Description")
     private String description;
 

@@ -13,17 +13,20 @@ import java.util.Map;
 
 /**
  * 微信业务异常
- * <p>该异常类主要封装微信服务器返回的错误信息</p>
- * <p>code为微信服务器返回的错误码</p>
- * <p>text为错误码对应的中文错误信息，在xml中进行配置和读取</p>
- * <p>message包含了错误码、错误信息，以及微信服务器返回的英文错误信息</p>
+ * <p>
+ * 该异常类主要封装微信服务器返回的错误信息。code为微信服务器返回的错误码；text为错误码对应的中文错误信息，
+ * 在xml中进行配置和读取；message包含了错误码、错误信息，以及微信服务器返回的英文错误信息。均通过对应getter获取
+ * </p>
  */
-public class WxException extends Exception{
+public class WxException extends Exception {
     private static Logger log = Logger.getLogger(WxException.class);
 
+    /**
+     * 错误码和错误信息的封装Map
+     */
     private static Map<String, String> wxErrorCode = new HashMap<String, String>();
 
-    /** 读取xml中的微信错误码 */
+    /** 读取xml中的微信错误码，封装到map中 */
     static {
         InputStream xml = WxException.class.getResourceAsStream("wxErrorCode.xml");
         SAXReader saxReader = new SAXReader();
@@ -42,11 +45,19 @@ public class WxException extends Exception{
         }
     }
 
-    /** 错误码 */
+    /**
+     * 错误码
+     */
     private String code;
-    /** 错误信息 */
+
+    /**
+     * 错误信息
+     */
     private String text;
-    /** 错误信息（微信服务器返回） */
+
+    /**
+     * 错误信息（微信服务器返回）
+     */
     private String errMsg;
 
     public WxException(String code, String errMsg) {

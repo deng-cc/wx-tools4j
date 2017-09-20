@@ -10,11 +10,7 @@ import java.io.InputStream;
 import java.io.Writer;
 
 /**
- * XmlUtil.
- *
- * @author Dulk
- * @version 20170904
- * @date 17-9-4
+ * Java和Xml相互转换的工具类
  */
 public class XmlUtil {
 
@@ -45,14 +41,13 @@ public class XmlUtil {
     });
 
 
-
-
     /**
      * 将xml的流形式转换为对应的对象
-     * @param is
-     * @param clazz
-     * @param <T>
-     * @return
+     * 
+     * @param is 输入流
+     * @param clazz Java对象
+     * @param <T> 泛型
+     * @return 指定的Java对象
      */
     public static <T> T toBean(InputStream is, Class<T> clazz) {
         XStream xStream = new XStream();
@@ -63,8 +58,9 @@ public class XmlUtil {
 
     /**
      * 将对象转换为xml格式的字符串
-     * @param obj
-     * @return
+     *
+     * @param obj Java对象
+     * @return xml格式的字符串
      */
     public static String toXml(Object obj) {
         XStream xStream = new XStream();
@@ -75,8 +71,9 @@ public class XmlUtil {
 
     /**
      * 将对象转换为xml格式的字符串，拓展CDATA块
-     * @param obj
-     * @return
+     *
+     * @param obj Java对象
+     * @return xml格式（含CDATA块）的字符串
      */
     public static String toXmlCDATA(Object obj) {
         XStream xStream = XmlUtil.xStream;
@@ -84,8 +81,5 @@ public class XmlUtil {
         String xml = xStream.toXML(obj);
         return xml;
     }
-
-
-
 
 }

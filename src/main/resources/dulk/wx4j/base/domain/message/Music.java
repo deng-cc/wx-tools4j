@@ -3,25 +3,37 @@ package dulk.wx4j.base.domain.message;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
- * Music.
- *
- * @author Dulk
- * @version 20170906
- * @date 17-9-6
+ * 微信交互的响应音乐参数的封装类
  */
 public class Music {
+
+    /**
+     * 标题
+     */
     @XStreamAlias("Title")
     private String title;
 
+    /**
+     * 描述
+     */
     @XStreamAlias("Description")
     private String description;
 
+    /**
+     * 音乐链接
+     */
     @XStreamAlias("MusicUrl")
     private String musicUrl;
 
+    /**
+     * 高质量音乐链接，wifi环境下优先使用该链接
+     */
     @XStreamAlias("HQMusicUrl")
     private String hqMusicUrl;
 
+    /**
+     * 缩略图的媒体id
+     */
     @XStreamAlias("ThumbMediaId")
     private String thumbMediaId;
 

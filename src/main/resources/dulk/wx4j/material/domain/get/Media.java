@@ -3,7 +3,10 @@ package dulk.wx4j.material.domain.get;
 import com.alibaba.fastjson.annotation.JSONField;
 
 /**
- * 其他媒体素材的实体类
+ * 其他永久媒体素材的封装类
+ * <p>
+ *     该类是获取永久素材列表的信息封装类，并最终封装为List作为同包中MediaList类的属性
+ * </p>
  */
 public class Media {
 

@@ -3,24 +3,32 @@ package dulk.wx4j.base.domain.message;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
- * Article.
- *
- * @author Dulk
- * @version 20170904
- * @date 17-9-4
+ * 微信交互的响应文章参数的封装类
  */
 @XStreamAlias("item")
 public class Article {
 
+    /**
+     * 文章标题
+     */
     @XStreamAlias("Title")
     private String title;
 
+    /**
+     * 文章描述
+     */
     @XStreamAlias("Description")
     private String description;
 
+    /**
+     * 文章的封面图片链接
+     */
     @XStreamAlias("PicUrl")
     private String picUrl;
 
+    /**
+     * 点击图文消息跳转链接
+     */
     @XStreamAlias("Url")
     private String url;
 

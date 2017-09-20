@@ -13,9 +13,13 @@ import java.util.Arrays;
 public class SignUtil {
     private static Logger log = Logger.getLogger(SignUtil.class);
 
-    //与接口配置信息中Token一致
+    /**
+     * token值
+     * <p>
+     * 该token值必须与公众号平台中开发者配置信息的token设置相同
+     * </p>
+     */
     private static String token;
-
 
     public static String getToken() {
         return token;
@@ -30,7 +34,7 @@ public class SignUtil {
      *
      * @param signature 微信加密签名
      * @param timestamp 时间戳
-     * @param nonce 随机数
+     * @param nonce     随机数
      * @return 布尔值确认是否验证通过
      */
     public static boolean checkSign(String signature, String timestamp, String nonce) {

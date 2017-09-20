@@ -1,18 +1,26 @@
 package dulk.wx4j.material.api;
 
 /**
- * MaterialType.
- *
- * @author Dulk
- * @version 20170913
- * @date 17-9-13
+ * 素材类型
  */
 public enum MaterialType {
 
+    /**
+     * 图片
+     */
     IMAGE("image"),
+    /**
+     * 语音
+     */
     VOICE("voice"),
+    /**
+     * 视频
+     */
     VIDEO("video"),
-    THUMB("thumb");
+    /**
+     * 缩略图
+     */
+    THUMB("thumb"),;
 
     private String value;
 

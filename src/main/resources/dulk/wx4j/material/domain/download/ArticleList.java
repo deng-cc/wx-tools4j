@@ -5,7 +5,10 @@ import com.alibaba.fastjson.annotation.JSONField;
 import java.util.List;
 
 /**
- * 获取的永久图文消息素材的集合
+ * 获取的永久图文消息的封装类
+ * <p>
+ * 该类是从"获取永久图文消息素材"接口调用后，返回的永久图文消息素材信息的封装类
+ * </p>
  */
 public class ArticleList {
 

@@ -19,8 +19,12 @@ import java.util.TimerTask;
 
 /**
  * 微信开发者配置初始化的监听器
+ * <p>
+ * 该监听器必须配置，用于读取微信开发者配置文件，并将值注入到各类中以调用。
+ * 开发者配置文件（wxConfig.properties）需放置在classpath下
+ * </p>
  */
-public class InitWxConfigListener implements ServletContextListener{
+public class InitWxConfigListener implements ServletContextListener {
     private static Logger log = Logger.getLogger(InitWxConfigListener.class);
 
     /**
@@ -50,12 +54,13 @@ public class InitWxConfigListener implements ServletContextListener{
     };
 
     /**
-     * 刷新的间隔时间（单位：毫秒），默认为1.5h
+     * 刷新的间隔时间（单位：毫秒），默认为1.5h（5400*1000）
      */
-    private long period = 5400*1000;
+    private long period = 5400 * 1000;
 
     /**
      * 容器初始化任务，以注入微信开发者配置
+     *
      * @param event
      */
     public void contextInitialized(ServletContextEvent event) {
@@ -87,6 +92,7 @@ public class InitWxConfigListener implements ServletContextListener{
 
     /**
      * 容器销毁任务，用以取消accessToken的自动刷新
+     *
      * @param event
      */
     public void contextDestroyed(ServletContextEvent event) {

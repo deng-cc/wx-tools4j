@@ -1,13 +1,11 @@
 package dulk.wx4j.message.api;
 
 /**
- * WxMsgAPI.
- *
- * @author Dulk
- * @version 20170904
- * @date 17-9-4
+ * 微信消息管理相关的API
  */
-public class WxMsgAPI {
+public class WxMessageAPI {
+
+    //微信消息类型
     public static final String MSG_TYPE_EVENT = "event";
     public static final String MSG_TYPE_TEXT = "text";
     public static final String MSG_TYPE_IMAGE = "image";
@@ -19,6 +17,7 @@ public class WxMsgAPI {
     public static final String MSG_TYPE_MUSIC = "music";
     public static final String MSG_TYPE_NEWS = "news";
 
+    //微信事件类型
     public static final String EVENT_TYPE_SUBSCRIBE = "subscribe";
     public static final String EVENT_TYPE_UNSUBSCRIBE = "unsubscribe";
     public static final String EVENT_TYPE_SCAN = "SCAN";

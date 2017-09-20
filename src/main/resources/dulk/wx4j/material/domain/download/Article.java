@@ -3,7 +3,10 @@ package dulk.wx4j.material.domain.download;
 import com.alibaba.fastjson.annotation.JSONField;
 
 /**
- * 下载的永久图文素材的封装类
+ * 获取的永久图文素材中文章的封装类
+ * <p>
+ * 该类是用于获取到的永久图文素材中，每条文章的信息封装类，该类作为同包中ArticleList类的属性
+ * </p>
  */
 public class Article {
 
@@ -27,7 +30,9 @@ public class Article {
 
     /**
      * 是否在文章中显示封面图片
-     * <p>是为1，否为0</p>
+     * <p>
+     * 是为1，否为0
+     * </p>
      */
     @JSONField(name = "show_cover_pic")
     private String isShowCoverPic;
@@ -64,14 +69,18 @@ public class Article {
 
     /**
      * 是否公开评论
-     * <p>1为是，0为否</p>
+     * <p>
+     * 1为是，0为否
+     * </p>
      */
     @JSONField(name = "need_open_comment")
     private String isNeedOpenComment;
 
     /**
      * 是否只有关注者可以评论
-     * <p>1为是，0为否</p>
+     * <p>
+     * 1为是，0为否
+     * </p>
      */
     @JSONField(name = "only_fans_can_comment")
     private String isOnlyFansCanComment;

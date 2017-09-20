@@ -1,7 +1,10 @@
 package dulk.wx4j.base.api;
 
 /**
- * 微信的配置类
+ * 微信的核心参数配置类
+ * <p>
+ * 该类用于封装微信开发者的各项配置
+ * </p>
  */
 public class WxConfig {
 
@@ -16,7 +19,7 @@ public class WxConfig {
     private static String appSecret;
 
     /**
-     * 开发者的微信接口使用凭证，需要通过appID和appSecret获取，有效期限制2小时，每天获取次数限制为2000次
+     * 开发者的微信接口使用凭证，需要通过appId和appSecret获取，有效期限制2小时，每天获取次数限制为2000次
      */
     private static String accessToken;
 

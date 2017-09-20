@@ -3,7 +3,7 @@ package dulk.wx4j.material.domain.upload;
 import com.alibaba.fastjson.annotation.JSONField;
 
 /**
- * 修改永久图文素材的封装类
+ * 修改永久图文素材的参数的封装类
  */
 public class NewArticle {
 

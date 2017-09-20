@@ -5,7 +5,7 @@ import com.alibaba.fastjson.annotation.JSONField;
 import java.util.List;
 
 /**
- * 其他素材列表的实体类
+ * 其他素材列表的封装类
  */
 public class MediaList {
 

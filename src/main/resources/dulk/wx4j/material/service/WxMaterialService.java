@@ -1,4 +1,4 @@
-package dulk.wx4j.material.util;
+package dulk.wx4j.material.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -34,16 +34,21 @@ import java.net.URL;
 import java.util.Arrays;
 
 /**
- * 临时素材的相关工具类
- * <p>封装了临时素材相关的功能，如上传，下载等</p>
+ * 素材管理的服务类
+ * <p>
+ * 该类封装了素材相关的各项方法，如上传、下载、修改等等
+ * </p>
  */
-public class WxMaterialUtil {
-    private static Logger log = Logger.getLogger(WxMaterialUtil.class);
+public class WxMaterialService {
+    private static Logger log = Logger.getLogger(WxMaterialService.class);
 
     /**
      * 上传临时图片素材
+     * <p>
+     * 临时图片素材支持类型{"png", "jpeg", "jpg", "gif"}，大小在2M以内，有效期3天
+     * </p>
      *
-     * @param file
+     * @param file 图片文件
      * @return 临时图片素材的mediaId
      * @throws MaterialException
      * @throws WxException
@@ -62,8 +67,11 @@ public class WxMaterialUtil {
 
     /**
      * 上传临时语音素材
+     * <p>
+     * 临时语音素材支持类型{"amr", "mp3"}，大小在2M以内，时长在60s以内，有效期3天
+     * </p>
      *
-     * @param file
+     * @param file 语音文件
      * @return 临时语音素材的mediaId
      * @throws MaterialException
      * @throws WxException
@@ -85,8 +93,11 @@ public class WxMaterialUtil {
 
     /**
      * 上传临时视频素材
+     * <p>
+     * 临时视频素材支持类型{"mp4"}，大小在10M以内，有效期3天
+     * </p>
      *
-     * @param file
+     * @param file 视频文件
      * @return 临时视频素材的mediaId
      * @throws MaterialException
      * @throws WxException
@@ -105,8 +116,11 @@ public class WxMaterialUtil {
 
     /**
      * 上传临时缩略图素材
+     * <p>
+     * 临时缩略图素材支持类型{"jpg"}，大小在64K以内，有效期3天
+     * </p>
      *
-     * @param file
+     * @param file 图片文件
      * @return 临时缩略图素材的mediaId
      * @throws MaterialException
      * @throws WxException
@@ -124,10 +138,11 @@ public class WxMaterialUtil {
     }
 
 
-
-
     /**
      * 上传永久图文消息素材
+     * <p>
+     * 图文消息中文章的内容支持html，但必须少于2w字符，小于1m，会过滤js和外部图片url，图片只能使用"上传图文消息内图片接口"获取的url
+     * </p>
      *
      * @param news 图文消息实体类
      * @return 永久图文消息素材的mediaId
@@ -141,10 +156,14 @@ public class WxMaterialUtil {
 
     /**
      * 上传图文消息内的图片获取url
-     * <p>该方法上传图片不占用公众号永久素材库的上限</p>
+     * <p>
+     * 该方法上传图片不占用公众号永久素材库的上限，支持类型{"png", "jpg"}，大小在1M以内
+     * </p>
      *
-     * @param file
+     * @param file 图片文件
      * @return 图文消息内图片的url
+     * @throws WxException
+     * @throws MaterialException
      */
     public static String uploadPermNewsImage(File file) throws MaterialException, WxException {
         if (!isAllowedType(ALLOWED_PERM_NEWSIMAGE_TYPE, file)) {
@@ -163,9 +182,12 @@ public class WxMaterialUtil {
 
     /**
      * 上传永久图片素材
+     * <p>
+     * 永久图片素材支持类型{"bmp", "png", "jpeg", "jpg", "gif"}，大小在2M以内
+     * </p>
      *
-     * @param file
-     * @return 永久图片素材的封装类PermImage，包括图片的mediaId和url
+     * @param file 图片文件
+     * @return 永久图片素材信息的封装类PermImage，包括图片的mediaId和url
      * @throws MaterialException
      * @throws WxException
      */
@@ -188,9 +210,14 @@ public class WxMaterialUtil {
 
     /**
      * 上传永久语音素材
-     * <p>todo:对于wma、wav两种格式的时长无法判断，目前交由微信服务器判断，超时长则抛出WxException</p>
+     * <p>
+     * 永久语音素材支持类型{"mp3", "wma", "wav", "amr", "mka"}，大小在2M以内
+     * </p>
+     * <p>
+     * todo:对于wma、wav两种格式的时长无法判断，目前交由微信服务器判断，超时长则抛出WxException
+     * </p>
      *
-     * @param file
+     * @param file 音频文件
      * @return 永久语音素材的mediaId
      * @throws MaterialException
      * @throws WxException
@@ -215,8 +242,11 @@ public class WxMaterialUtil {
 
     /**
      * 上传永久视频素材
+     * <p>
+     * 永久视频素材支持类型{"mp4"}，大小限制在10M以内
+     * </p>
      *
-     * @param file
+     * @param file         视频文件
      * @param title        视频标题
      * @param introduction 视频描述（简介）
      * @return 永久视频素材的mediaId
@@ -241,8 +271,11 @@ public class WxMaterialUtil {
 
     /**
      * 上传永久缩略图素材
+     * <p>
+     * 永久缩略图素材支持类型{"jpg"}，大小限制在64K以内
+     * </p>
      *
-     * @param file
+     * @param file 图片文件
      * @return 永久缩略图素材的封装类PermImage，包括图片的mediaId和url
      * @throws MaterialException
      * @throws WxException
@@ -266,15 +299,18 @@ public class WxMaterialUtil {
 
     /**
      * 下载临时素材
-     * <p>封装的File文件类的文件类型，必须和mediaId对应的素材类型相同，否则很容易抛出异常</p>
-     * <p>如new File("C:\\temp.mp4")，则mediaId必须对应的是视频素材，否则容易抛出WxException，或因为json解析而抛出JSONException</p>
+     * <p>
+     * 封装的File文件类的文件类型，必须和mediaId对应的素材类型相同，否则易抛出异常。
+     * 如new File("C:\\temp.mp4")，则mediaId必须对应的是视频素材，否则易抛出WxException，或因为json解析而出现JSONException
+     * </p>
      *
      * @param mediaId 临时素材的mediaId
      * @param file    将要写入内容的File类
      * @return 下载文件的File类
      * @throws WxException
+     * @throws MaterialException
      */
-    public static File downloadTemp(String mediaId, File file) throws WxException {
+    public static File downloadTemp(String mediaId, File file) throws WxException, MaterialException {
         String url = getUrl_downloadTempMedia(mediaId);
         //视频不支持https下载，NetUtil中均为https协议请求，故此处选择http协议
         if (isAllowedType(ALLOWED_TEMP_VIDEO_TYPE, file)) {
@@ -300,12 +336,18 @@ public class WxMaterialUtil {
             }
             return file;
 
-        } else {
+        }
+        //其他素材
+        else if (isAllowedType(ALLOWED_TEMP_IMAGE_TYPE, file) || isAllowedType(ALLOWED_TEMP_THUMB_TYPE, file)
+                || isAllowedType(ALLOWED_TEMP_VOICE_TYPE, file)) {
             NetUtil.sendRequestGET(url, file);
             return file;
-        }
-    }
 
+        } else {
+            throw new MaterialException("File文件的类型不符，未在指定的文件类型范围内");
+        }
+
+    }
 
     /**
      * 下载永久图文消息素材
@@ -329,6 +371,8 @@ public class WxMaterialUtil {
      * @return 不同的素材返回的字符串代表含义不同
      *         视频素材：返回视频素材的JSON字符串，同时视频内容写入到参数file中
      *         其他素材：如图片、语音、缩略图等，返回其文件的绝对路径，同时内容写入到参数file中
+     * @throws WxException
+     * @throws MaterialException
      */
     public static String downloadPermMedia(String mediaId, File file) throws WxException, MaterialException {
         String url = getUrl_downloadPermMedia();
@@ -364,6 +408,7 @@ public class WxMaterialUtil {
             NetUtil.sendRequestPOST(url, content, file);
             try {
                 return file.getCanonicalPath();
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -378,7 +423,9 @@ public class WxMaterialUtil {
      *
      * @param startIndex 从全部素材的startIndex位置开始，0表示从第一个素材开始返回
      * @param count      返回素材的数量，取值在1-20之间
-     * @return
+     * @return 永久图文素材的封装类
+     * @throws MaterialException
+     * @throws WxException
      */
     public static NewsList getPermNewsList(int startIndex, int count) throws MaterialException, WxException {
         if (count < 0 || count > 20) {
@@ -395,7 +442,7 @@ public class WxMaterialUtil {
      * @param type       其他媒体素材类型，voice/video/image，不包括thumb
      * @param startIndex 从全部素材的startIndex位置开始，0表示从第一个素材开始返回
      * @param count      返回素材的数量，取值在1-20之间
-     * @return
+     * @return 其他永久素材的封装类
      * @throws MaterialException
      * @throws WxException
      */
@@ -428,6 +475,7 @@ public class WxMaterialUtil {
      * @param type 其他永久素材类型voice/video/image，没有thumb
      * @return 其他永久素材总数
      * @throws WxException
+     * @throws MaterialException
      */
     public static int getPermMediaCount(MaterialType type) throws WxException, MaterialException {
         if (MaterialType.THUMB == type) {
@@ -451,12 +499,17 @@ public class WxMaterialUtil {
 
     /**
      * 修改更新永久图文素材
-     * <p>一条图文消息有多条文章，该方法仅针对mediaId对应图文消息中指定index的文章做修改处理</p>
-     * <p>这里的参数，封装类Article和上传永久图文素材中的Article是一样的</p>
+     * <p>
+     * 一条图文消息有多条文章，该方法仅针对mediaId对应图文消息中指定index的文章做修改处理
+     * </p>
+     * <p>
+     * 这里的参数，封装类Article和上传永久图文素材中的Article是一样的
+     * </p>
      *
      * @param mediaId 图文消息对应的媒体id
-     * @param index 要更新的文章在图文消息中的索引位置，第一篇为0
+     * @param index   要更新的文章在图文消息中的索引位置，第一篇为0
      * @param article 新的文章
+     * @throws WxException
      */
     public static void updatePermNews(String mediaId, int index, Article article) throws WxException {
         String url = getUrl_updatePermNews();
@@ -466,15 +519,11 @@ public class WxMaterialUtil {
     }
 
 
-
-
-
-
     /**
      * 获取指定素材类型的总数
      *
      * @param type voice/video/image/news
-     * @return
+     * @return 制定素材类型的数量
      * @throws WxException
      */
     private static String getPermCount(String type) throws WxException {
@@ -484,11 +533,14 @@ public class WxMaterialUtil {
 
     /**
      * 上传临时素材
-     * <p>临时素材的mediaId是可复用的，临时素材有效期为3天</p>
+     * <p>
+     * 临时素材的mediaId是可复用的，临时素材有效期为3天
+     * </p>
      *
      * @param file 文件
      * @param type 文件类型
-     * @return
+     * @return 临时素材的媒体id
+     * @throws WxException
      */
     private static String uploadTemp(File file, MaterialType type) throws WxException {
         String mediaId = null;
@@ -521,9 +573,9 @@ public class WxMaterialUtil {
     /**
      * 判断某个文件是否是允许的类型
      *
-     * @param allowedTypes
-     * @param file
-     * @return
+     * @param allowedTypes 允许的文件类型
+     * @param file         文件
+     * @return 文件是否在允许范围内，布尔值
      */
     private static boolean isAllowedType(String[] allowedTypes, File file) {
         String type = getFileSuffix(file);
@@ -532,10 +584,12 @@ public class WxMaterialUtil {
 
     /**
      * 判断语音文件的播放时间长度（单位：秒）
-     * <p>参考链接: http://www.cnblogs.com/yoyotl/p/5614530.html</p>
+     * <p>
+     * 参考链接: http://www.cnblogs.com/yoyotl/p/5614530.html
+     * </p>
      *
-     * @param file
-     * @return
+     * @param file 语音文件
+     * @return 语音文件的时长
      */
     private static long getVoicePeriod(File file) {
         //MP3File类支持解析的音频类型，另不准确或不支持wma、wav

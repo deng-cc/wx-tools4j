@@ -8,13 +8,12 @@ import javax.servlet.ServletContextListener;
 import java.io.File;
 
 /**
- * InitLog4jListener.
- *
- * @author Dulk
- * @version 20170606
- * @date 17-6-6
+ * 简单的log4j的初始化监听器
+ * <p>
+ * 如果需要初始化log4j的配置，则需要在web.xml中配置该监听器，并将配置文件（log4j.properties）放置到classpath
+ * </p>
  */
-public class InitLog4jListener implements ServletContextListener{
+public class InitLog4jListener implements ServletContextListener {
 
     public void contextInitialized(ServletContextEvent sce) {
         String path = sce.getServletContext().getRealPath("/WEB-INF/classes/log4j.properties");
@@ -30,5 +29,6 @@ public class InitLog4jListener implements ServletContextListener{
     }
 
     public void contextDestroyed(ServletContextEvent sce) {
+        //do nothing
     }
 }

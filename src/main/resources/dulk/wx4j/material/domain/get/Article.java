@@ -4,6 +4,9 @@ import com.alibaba.fastjson.annotation.JSONField;
 
 /**
  * 图文消息素材列表中文章的封装类
+ * <p>
+ * 该类是获取永久图文消息素材列表的信息中，图文素材的文章的封装类，并最终封装为List作为同包中ArticleList类的属性
+ * </p>
  */
 public class Article {
 
@@ -21,7 +24,9 @@ public class Article {
 
     /**
      * 是否在文章中显示封面图片
-     * <p>是为1，否为0</p>
+     * <p>
+     * 是为1，否为0
+     * </p>
      */
     @JSONField(name = "show_cover_pic")
     private String isShowCoverPic;
@@ -64,14 +69,18 @@ public class Article {
 
     /**
      * 是否开放评论
-     * <p>1为是，0为否</p>
+     * <p>
+     * 1为是，0为否
+     * </p>
      */
     @JSONField(name = "need_open_comment")
     private String isNeedOpenComment;
 
     /**
      * 是否只有关注者可以评论
-     * <p>1为是，0为否</p>
+     * <p>
+     * 1为是，0为否
+     * </p>
      */
     @JSONField(name = "only_fans_can_comment")
     private String isOnlyFansCanComment;

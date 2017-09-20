@@ -1,7 +1,7 @@
 package dulk.wx4j.material.domain.upload;
 
 /**
- * 永久图片素材的实体类
+ * 上传永久图片素材成功后，返回的图片信息的封装类
  */
 public class PermImage {
 

@@ -6,7 +6,9 @@ import java.security.cert.X509Certificate;
 
 /**
  * 证书信任管理器（用于https请求）。
- * <p>该类可以让它信任我们指定的证书，此处定义为信任所有证书，不论是否权威机构颁发</p>
+ * <p>
+ * 该类可以让它信任我们指定的证书，此处定义为信任所有证书，不论是否权威机构颁发
+ * </p>
  */
 public class MyX509TrustManager implements X509TrustManager {
 

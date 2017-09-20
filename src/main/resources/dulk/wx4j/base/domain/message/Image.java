@@ -3,14 +3,13 @@ package dulk.wx4j.base.domain.message;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
- * Image.
- *
- * @author Dulk
- * @version 20170906
- * @date 17-9-6
+ * 微信交互的响应图片参数的封装类
  */
 public class Image {
-    
+
+    /**
+     * 图片媒体id
+     */
     @XStreamAlias("MediaId")
     private String mediaId;
 

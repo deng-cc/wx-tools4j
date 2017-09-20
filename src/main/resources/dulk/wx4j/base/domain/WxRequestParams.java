@@ -3,86 +3,165 @@ package dulk.wx4j.base.domain;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
- * WxRequestParams.
- *
- * @author Dulk
- * @version 20170904
- * @date 17-9-4
+ * 微信服务器发送到我方服务器的请求参数封装类
+ * <p>
+ * 该类封装了与用于交互时的所有类别消息的微信服务器请求参数，在WxSupport类中会自动处理注入值，
+ * 其中根据用户消息的不同，该类的参数也会发生变化，没有的请求参数会是空值
+ * </p>
  */
 @XStreamAlias("xml")
 public class WxRequestParams {
+
+    /**
+     * 接收方
+     */
     @XStreamAlias("ToUserName")
     private String toUserName;
 
+    /**
+     * 发送方
+     */
     @XStreamAlias("FromUserName")
     private String fromUserName;
 
+    /**
+     * 消息生成时间
+     */
     @XStreamAlias("CreateTime")
     private String createTime;
 
+    /**
+     * 消息类型
+     */
     @XStreamAlias("MsgType")
     private String msgType;
 
+    /**
+     * 文本消息内容
+     */
     @XStreamAlias("Content")
     private String content;
 
+    /**
+     * 消息id
+     */
     @XStreamAlias("MsgId")
     private String msgId;
 
+    /**
+     * 图片链接
+     */
     @XStreamAlias("PicUrl")
     private String picUrl;
 
+    /**
+     * 媒体id
+     */
     @XStreamAlias("MediaId")
     private String mediaId;
 
+    /**
+     * 语音格式
+     */
     @XStreamAlias("Format")
     private String format;
 
+    /**
+     * 语音消息id
+     * <p>
+     * 注意，该消息id为适配参数，和之前的msgId在字母大小写上有不同，注意识别
+     * </p>
+     */
     @XStreamAlias("MsgID")
     private String msgID;
 
+    /**
+     * 语音识别结果
+     */
     @XStreamAlias("Recognition")
     private String recognition;
 
+    /**
+     * 缩略图媒体id
+     */
     @XStreamAlias("ThumbMediaId")
     private String thumbMediaId;
 
+    /**
+     * 地理位置纬度
+     */
     @XStreamAlias("Location_X")
     private String locationX;
 
+    /**
+     * 地理位置经度
+     */
     @XStreamAlias("Location_Y")
     private String locationY;
 
+    /**
+     * 地图缩放大小
+     */
     @XStreamAlias("Scale")
     private String scale;
 
+    /**
+     * 地理位置信息
+     */
     @XStreamAlias("Label")
     private String label;
 
+    /**
+     * 链接消息标题
+     */
     @XStreamAlias("Title")
     private String title;
 
+    /**
+     * 链接消息描述
+     */
     @XStreamAlias("Description")
     private String description;
 
+    /**
+     * 链接消息的链接
+     */
     @XStreamAlias("Url")
     private String url;
 
+    /**
+     * 事件类型
+     */
     @XStreamAlias("Event")
     private String event;
 
+    /**
+     * 事件key值
+     */
     @XStreamAlias("EventKey")
     private String eventKey;
 
+    /**
+     * 二维码ticket，可用来换取二维码图片
+     */
     @XStreamAlias("Ticket")
     private String ticket;
 
+    /**
+     * 地理位置纬度
+     */
     @XStreamAlias("Latitude")
     private String latitude;
 
+    /**
+     * 地理位置经度
+     */
     @XStreamAlias("Longitude")
     private String longitude;
-    
+
+    /**
+     * 地理位置精度
+     */
     @XStreamAlias("Precision")
     private String precision;
 

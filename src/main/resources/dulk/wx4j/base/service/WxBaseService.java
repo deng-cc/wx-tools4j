@@ -13,13 +13,17 @@ import java.io.IOException;
 
 /**
  * 微信的基本服务类
+ * <p>
+ * 该服务类主要用于微信最基本的接口调用凭证获取，和微信服务器的请求验证
+ * </p>
  */
 public class WxBaseService {
     private static Logger log = Logger.getLogger(WxBaseService.class);
 
     /**
      * 立即刷新获取一个新的accessToken
-     * @return
+     *
+     * @return accessToken值
      */
     public static String getNewAccessToken() throws WxException {
         String token = NetUtil.sendRequestGET(WxBaseAPI.getUrl_getAccessToken()).getString("access_token");
@@ -30,9 +34,12 @@ public class WxBaseService {
 
     /**
      * 微信服务器校验
-     * <p>开发者对请求进行校验，确认该请求来自微信服务器</p>
-     * @param request
-     * @param response
+     * <p>
+     * 开发者对请求进行校验，确认该请求来自微信服务器
+     * </p>
+     *
+     * @param request  http请求
+     * @param response http响应
      * @return
      */
     public static boolean wxServerConfirm(HttpServletRequest request, HttpServletResponse response) {
@@ -67,9 +74,5 @@ public class WxBaseService {
         }
         return result;
     }
-
-
-
-
 
 }

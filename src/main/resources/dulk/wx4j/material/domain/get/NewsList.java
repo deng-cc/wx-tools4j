@@ -5,7 +5,7 @@ import com.alibaba.fastjson.annotation.JSONField;
 import java.util.List;
 
 /**
- * 图文消息素材列表的实体类
+ * 图文消息素材列表的封装类
  */
 public class NewsList {
 

@@ -11,7 +11,6 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -32,15 +31,17 @@ import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
 
 /**
- * 发送http或者https请求的工具类.
+ * 发送https请求的工具类
  */
 public class NetUtil {
     private static Logger log = Logger.getLogger(NetUtil.class);
 
     /**
-     * 以GET请求方式调用微信url接口，以获取对应结果的字符串
-     * @param url
-     * @return
+     * 以GET请求方式调用微信url接口，以获取对应结果的字符串JSON对象
+     *
+     * @param url 调用的接口
+     * @return 返回对应结果字符串的JSONObject对象
+     * @throws WxException
      */
     public static JSONObject sendRequestGET(String url) throws WxException {
         String result = sendRequest(url, "GET", null);
@@ -55,8 +56,10 @@ public class NetUtil {
 
     /**
      * 以GET请求方式调用微信url接口，以获取对应结果的File
-     * @param url 微信接口
+     *
+     * @param url  微信接口
      * @param file 将写入内容的file
+     * @throws WxException
      */
     public static void sendRequestGET(String url, File file) throws WxException {
         sendRequest(url, "GET", null, file);
@@ -64,9 +67,11 @@ public class NetUtil {
 
     /**
      * 以POST请求方式调用微信url接口，以获取对应结果的字符串
+     *
      * @param url
      * @param content 需要附带提交的数据
-     * @return
+     * @return 返回对应结果字符串的JSONObject对象
+     * @throws WxException
      */
     public static JSONObject sendRequestPOST(String url, String content) throws WxException {
         String result = sendRequest(url, "POST", content);
@@ -81,25 +86,26 @@ public class NetUtil {
 
     /**
      * 以POST请求方式调用微信url接口，以获取对应结果的File
-     * @param url 微信接口
+     *
+     * @param url     微信接口
      * @param content 需要提交的数据
-     * @param file 将写入内容的file
+     * @param file    将写入内容的file
+     * @throws WxException
      */
     public static void sendRequestPOST(String url, String content, File file) throws WxException {
         sendRequest(url, "POST", content, file);
     }
 
 
-
-
-
     /**
      * 发送一个https请求并获取结果
-     * <p>该方法针对于微信中对于大部分官方提供接口的访问，以得到期望数据</p>
+     * <p>
+     * 该方法针对于微信中对于大部分官方提供接口的访问，以得到期望数据
+     * </p>
      *
-     * @param url 请求地址url
+     * @param url           请求地址url
      * @param requestMethod 请求方法GET/POST
-     * @param outputStr 需要额外提交的数据，没有的话填null
+     * @param outputStr     需要额外提交的数据，没有的话填null
      * @return response返回结果的字符串
      */
     private static String sendRequest(String url, String requestMethod, String outputStr) {
@@ -174,12 +180,15 @@ public class NetUtil {
 
     /**
      * 发送一个https请求并获取结果
-     * <p>该方法针对于微信中对于媒体文件下载接口的访问，以得到期望数据</p>
+     * <p>
+     * 该方法主要针对于微信中对于媒体文件下载接口的访问，以得到期望数据
+     * </p>
      *
-     * @param url 请求地址url
+     * @param url           请求地址url
      * @param requestMethod 请求方法GET/POST
-     * @param outputStr 需要额外提交的数据，没有的话填null
-     * @param file 期望获取文件的File类
+     * @param outputStr     需要额外提交的数据，没有的话填null
+     * @param file          期望获取文件的File类
+     * @throws WxException
      */
     private static void sendRequest(String url, String requestMethod, String outputStr, File file) throws WxException {
         outputStr = outputStr == null || outputStr.equals("") ? null : outputStr;
@@ -221,7 +230,7 @@ public class NetUtil {
             String contentType = httpUrlConn.getContentType();
             InputStream is = httpUrlConn.getInputStream();
             //如果输入流是微信返回的业务错误代码
-            if ( contentType != null && contentType.contains("application/json")) {
+            if (contentType != null && contentType.contains("application/json")) {
                 InputStreamReader inputStreamReader = new InputStreamReader(is, "UTF-8");
                 BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
                 String str = null;
@@ -279,11 +288,11 @@ public class NetUtil {
     /**
      * 模拟表单形式，上传form-data中的媒体文件
      *
-     * @param url  请求地址url
-     * @param file 需要上传的文件
+     * @param url      请求地址url
+     * @param file     需要上传的文件
      * @param fileDesc 额外需要提交的文件描述信息(JSON格式)，如微信提交视频文件要求增加json格式的文件描述
      * @return 返回结果的JSONObject
-     * @throws Exception
+     * @throws WxException
      */
     public static JSONObject uploadMediaPOST(String url, File file, String... fileDesc) throws WxException {
         BufferedReader reader = null;

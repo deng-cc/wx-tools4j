@@ -4,7 +4,7 @@ import dulk.wx4j.base.dispatch.WxSupport;
 import dulk.wx4j.base.domain.message.Video;
 import dulk.wx4j.base.exception.WxException;
 import dulk.wx4j.material.exception.MaterialException;
-import dulk.wx4j.material.util.WxMaterialUtil;
+import dulk.wx4j.material.service.WxMaterialService;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Controller;
@@ -48,7 +48,7 @@ public class WxAction extends WxSupport{
                     getRealPath("/WEB-INF/temp/image") + "/" + file.getFileItem().getName();
             File temp = new File(path);
             FileUtils.copyInputStreamToFile(file.getInputStream(), temp);
-            WxMaterialUtil.uploadTempImage(temp);
+            WxMaterialService.uploadTempImage(temp);
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -73,7 +73,7 @@ public class WxAction extends WxSupport{
                     getRealPath("/WEB-INF/temp/voice") + "/" + file.getFileItem().getName();
             File temp = new File(path);
             FileUtils.copyInputStreamToFile(file.getInputStream(), temp);
-            WxMaterialUtil.uploadTempVoice(temp);
+            WxMaterialService.uploadTempVoice(temp);
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -98,7 +98,7 @@ public class WxAction extends WxSupport{
                     getRealPath("/WEB-INF/temp/video") + "/" + file.getFileItem().getName();
             File temp = new File(path);
             FileUtils.copyInputStreamToFile(file.getInputStream(), temp);
-            WxMaterialUtil.uploadTempVideo(temp);
+            WxMaterialService.uploadTempVideo(temp);
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -124,7 +124,7 @@ public class WxAction extends WxSupport{
                     getRealPath("/WEB-INF/temp/thumb") + "/" + file.getFileItem().getName();
             File temp = new File(path);
             FileUtils.copyInputStreamToFile(file.getInputStream(), temp);
-            WxMaterialUtil.uploadTempThumb(temp);
+            WxMaterialService.uploadTempThumb(temp);
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
