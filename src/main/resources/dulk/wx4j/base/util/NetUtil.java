@@ -37,9 +37,19 @@ public class NetUtil {
     private static Logger log = Logger.getLogger(NetUtil.class);
 
     /**
+     * 以GET请求方式调用微信url接口，以获取对应结果的字符串
+     *
+     * @param url 微信接口
+     * @return 结果字符串
+     */
+    public static String throwRequestGET(String url) {
+        return NetUtil.sendRequest(url, "GET", null);
+    }
+
+    /**
      * 以GET请求方式调用微信url接口，以获取对应结果的字符串JSON对象
      *
-     * @param url 调用的接口
+     * @param url 微信接口
      * @return 返回对应结果字符串的JSONObject对象
      * @throws WxException
      */
@@ -65,11 +75,23 @@ public class NetUtil {
         sendRequest(url, "GET", null, file);
     }
 
+
     /**
      * 以POST请求方式调用微信url接口，以获取对应结果的字符串
      *
-     * @param url
-     * @param content 需要附带提交的数据
+     * @param url     微信接口
+     * @param content 需要附带提交的数据，json或者xml格式
+     * @return 返回对应结果字符串
+     */
+    public static String throwRequestPOST(String url, String content) {
+        return sendRequest(url, "POST", content);
+    }
+
+    /**
+     * 以POST请求方式调用微信url接口，以获取对应结果的JSONO对象
+     *
+     * @param url     微信接口
+     * @param content 需要附带提交的数据，常为json字符串
      * @return 返回对应结果字符串的JSONObject对象
      * @throws WxException
      */
@@ -88,7 +110,7 @@ public class NetUtil {
      * 以POST请求方式调用微信url接口，以获取对应结果的File
      *
      * @param url     微信接口
-     * @param content 需要提交的数据
+     * @param content 需要提交的数据，常为json字符串
      * @param file    将写入内容的file
      * @throws WxException
      */

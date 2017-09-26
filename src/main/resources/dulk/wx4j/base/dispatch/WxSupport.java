@@ -97,8 +97,7 @@ public abstract class WxSupport {
         try {
             //设置编码避免中文乱码
             response.setCharacterEncoding("UTF-8");
-            String responseData = XmlUtil.toXml(wxResponseParams);
-            //String responseData = XmlUtil.toXmlCDATA(wxResponseParams);
+            String responseData = XmlUtil.toXmlCDATA(wxResponseParams);
             PrintWriter out = response.getWriter();
             out.print(responseData);
             out.close();

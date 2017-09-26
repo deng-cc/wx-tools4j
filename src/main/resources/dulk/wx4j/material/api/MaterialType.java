@@ -20,7 +20,7 @@ public enum MaterialType {
     /**
      * 缩略图
      */
-    THUMB("thumb"),;
+    THUMB("thumb");
 
     private String value;
 
