@@ -32,6 +32,7 @@ public class SignUtil {
      * ASCII字典序排列的参数进行字符串拼接，然后拼接API密钥后进行MD加密。
      * 算法参考：https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=4_3
      * </p>
+     *
      * @param params 需要发送的所有数据设置为的Map
      * @return 签名sign
      */
@@ -61,6 +62,7 @@ public class SignUtil {
      * 调用随机数函数生成，将得到的值转换为字符串，不得长于32位。
      * 算法参考：https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=4_3
      * </p>
+     *
      * @return 随机数字符串
      */
     public static String createNonceStr() {

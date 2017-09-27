@@ -1,18 +1,32 @@
 package dulk.wx4j.pay.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.EncodeHintType;
+import com.google.zxing.MultiFormatWriter;
+import com.google.zxing.WriterException;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.common.BitMatrix;
 import dulk.wx4j.base.util.NetUtil;
 import dulk.wx4j.base.util.XmlUtil;
 import dulk.wx4j.pay.api.WxPayAPI;
 import dulk.wx4j.pay.domain.PayRequestJSAPI;
+import dulk.wx4j.pay.domain.PayRequestNATIVE;
 import dulk.wx4j.pay.domain.UnifiedorderRequest;
 import dulk.wx4j.pay.domain.UnifiedorderResponse;
 import dulk.wx4j.pay.exception.PayException;
 import dulk.wx4j.pay.util.SignUtil;
 import org.apache.log4j.Logger;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -82,5 +96,83 @@ public class WxPayService {
         return result;
     }
 
+    /**
+     * 生成微信支付的二维码，以流形式输出
+     *
+     * @param request   微信二维码扫码支付的请求类
+     * @param imgWidth  二维码图片的宽度
+     * @param imgHeight 二维码图片的高度
+     * @return 二维码图片（jpg格式）的输出流
+     * @throws PayException
+     */
+    public static OutputStream wxPayByNATIVE(PayRequestNATIVE request, int imgWidth, int imgHeight) throws PayException {
+        String imageType = "jpg";
+        BitMatrix bitMatrix = basicWxPayByNATIVE(request, imgWidth, imgHeight);
+        OutputStream out = null;
+        try {
+            MatrixToImageWriter.writeToStream(bitMatrix, imageType, out);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return out;
+    }
+
+    /**
+     * 生成微信支付的二维码图片，并返回其File封装类
+     *
+     * @param request   微信二维码扫码支付的请求类
+     * @param imgWidth  二维码图片的宽度
+     * @param imgHeight 二维码图片的高度
+     * @param filepath  二维码图片的图片路径
+     * @return 二维码的File封装类
+     * @throws PayException
+     */
+    public static File wxPayByNATIVE(PayRequestNATIVE request, int imgWidth, int imgHeight, String filepath) throws PayException {
+        String imageType = "jpg";
+        BitMatrix bitMatrix = basicWxPayByNATIVE(request, imgWidth, imgHeight);
+        Path path = FileSystems.getDefault().getPath(filepath);
+        try {
+            MatrixToImageWriter.writeToPath(bitMatrix, imageType, path);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return new File(filepath);
+    }
+
+
+    /**
+     * 生成微信支付二维码的基础方法
+     * <p>
+     * 该方法返回一个BitMatrix类，用以进一步调用，或将二维码转成流，或图片
+     * </p>
+     *
+     * @param request   微信二维码扫码支付的请求类
+     * @param imgWidth  二维码图片的宽度
+     * @param imgHeight 二维码图片的高度
+     * @return BitMatrix类
+     * @throws PayException
+     */
+    private static BitMatrix basicWxPayByNATIVE(PayRequestNATIVE request, int imgWidth, int imgHeight) throws PayException {
+        BitMatrix bitMatrix = null;
+        try {
+            UnifiedorderResponse response = unifiedorder(request);
+            String codeUrl = response.getCodeUrl();
+            if (codeUrl == null) {
+                throw new PayException("二维码地址链接为空");
+            }
+            Map<EncodeHintType, String> hints = new HashMap<EncodeHintType, String>();
+            hints.put(EncodeHintType.CHARACTER_SET, "UTF-8");
+            bitMatrix = new MultiFormatWriter().encode(codeUrl, BarcodeFormat.QR_CODE, imgWidth, imgHeight, hints);
+
+        } catch (PayException e) {
+            log.error(e.getMessage());
+            throw new PayException(e.getMessage());
+        } catch (WriterException e) {
+            e.printStackTrace();
+        }
+
+        return bitMatrix;
+    }
 
 }

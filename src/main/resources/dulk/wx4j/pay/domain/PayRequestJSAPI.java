@@ -14,11 +14,11 @@ public class PayRequestJSAPI extends UnifiedorderRequest {
     /**
      * JSAPI方式请求统一下单接口的参数类构造函数
      *
-     * @param openId 用户在该公众号下的唯一标识openId
-     * @param body 商品描述
-     * @param totalFee 总价，单位分，币种默认人民币CNY
+     * @param openId          用户在该公众号下的唯一标识openId
+     * @param body            商品描述
+     * @param totalFee        总价，单位分，币种默认人民币CNY
      * @param merchantTradeNo 商户内部系统的订单号
-     * @param notifyUrl 支付回调地址url
+     * @param notifyUrl       支付回调地址url
      */
     public PayRequestJSAPI(String openId, String body, int totalFee, String merchantTradeNo, String notifyUrl) {
         super(body, totalFee, merchantTradeNo, notifyUrl);

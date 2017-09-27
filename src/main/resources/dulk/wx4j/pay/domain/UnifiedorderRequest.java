@@ -103,7 +103,7 @@ public abstract class UnifiedorderRequest {
     @XStreamAlias("trade_type")
     private String tradeType;
 
-    
+
     //非必需参数
 
     /**
@@ -429,5 +429,5 @@ public abstract class UnifiedorderRequest {
     public void setSceneInfo(String sceneInfo) {
         this.sceneInfo = sceneInfo;
     }
-    
+
 }
