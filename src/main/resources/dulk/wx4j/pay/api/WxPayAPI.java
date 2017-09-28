@@ -10,8 +10,19 @@ public class WxPayAPI {
 
     /**
      * "统一下单"的接口
+     * <p>
+     * https协议，POST请求
+     * </p>
      */
     private static String url_unifiedorder = "https://api.mch.weixin.qq.com/pay/unifiedorder";
+
+    /**
+     * "申请退款"的接口
+     * <p>
+     * https协议，POST请求
+     * </p>
+     */
+    private static String url_refund = "https://api.mch.weixin.qq.com/secapi/pay/refund";
 
 
     /**
@@ -23,4 +34,12 @@ public class WxPayAPI {
         return url_unifiedorder;
     }
 
+    /**
+     * 获取"申请退款"的接口
+     *
+     * @return 接口url
+     */
+    public static String getUrl_refund() {
+        return url_refund;
+    }
 }

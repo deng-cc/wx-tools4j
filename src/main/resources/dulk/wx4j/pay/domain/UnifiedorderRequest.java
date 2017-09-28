@@ -2,19 +2,14 @@ package dulk.wx4j.pay.domain;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import dulk.wx4j.base.api.WxConfig;
-import dulk.wx4j.base.util.XmlUtil;
 import dulk.wx4j.pay.util.SignUtil;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.TreeMap;
 
 /**
  * 请求统一下单接口时的参数封装类
  */
 @XStreamAlias("xml")
-public abstract class UnifiedorderRequest {
+public class UnifiedorderRequest extends BaseRequest{
 
     //必需参数
 
@@ -212,47 +207,6 @@ public abstract class UnifiedorderRequest {
         this.merchantTradeNo = merchantTradeNo;
         this.notifyUrl = notifyUrl;
     }
-
-    /**
-     * 将对象中不为空的属性和值转换为TreeMap以进行签名运算
-     * <p>
-     * 该方法以key：value键值对方式存储对象的属性和值，其中key并非属性名，而是其XStreamAlias注解值。
-     * 注意：sign属性不参与转换，因为在后续的签名算法中不需要sign
-     * </p>
-     *
-     * @return 以属性：值存储的TreeMap
-     */
-    private TreeMap<String, String> toTreeMap() {
-        TreeMap<String, String> map = new TreeMap<String, String>();
-        Field[] fields = this.getClass().getSuperclass().getDeclaredFields();
-        for (Field field : fields) {
-            try {
-                Object value = field.get(this);
-                if (value != null && !"sign".equals(field.getName()) && field.isAnnotationPresent(XStreamAlias.class)) {
-                    String name = field.getAnnotation(XStreamAlias.class).value();
-                    map.put(name, value.toString());
-                }
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        }
-        return map;
-    }
-
-    /**
-     * 将统一下单参数封装类，转换为带签名的xml
-     * <p>
-     * 调用统一下单接口时，需要先将其他参数进行签名，再将结果同时作为参数之一最终转换为xml
-     * </p>
-     *
-     * @return 统一下单请求参数的xml格式字符串（含签名）
-     */
-    public String toSignedXml() {
-        setSign(SignUtil.createSign(this.toTreeMap()));
-        return XmlUtil.toXmlCDATA(this);
-    }
-
-
 
     public String getAppId() {
         return appId;
