@@ -5,6 +5,10 @@ import dulk.wx4j.base.domain.message.Video;
 import dulk.wx4j.base.exception.WxException;
 import dulk.wx4j.material.exception.MaterialException;
 import dulk.wx4j.material.service.WxMaterialService;
+import dulk.wx4j.pay.domain.PayResult;
+import dulk.wx4j.pay.exception.PayException;
+import dulk.wx4j.pay.service.WxPayHandler;
+import dulk.wx4j.pay.service.WxPayService;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Controller;
@@ -133,6 +137,23 @@ public class WxAction extends WxSupport{
         } catch (IOException e) {
             e.printStackTrace();
         } catch (MaterialException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @RequestMapping(value = "/afterWxPay")
+    public void afterWxPay(HttpServletRequest request, HttpServletResponse response) {
+        try {
+            WxPayService.afterWxPay(request, response, new WxPayHandler() {
+                public void doWithSuccess(PayResult payResult) {
+                    System.out.println( payResult.getWxTradeNo() + "订单支付成功");
+                }
+
+                public void doWithFail(PayResult payResult) {
+                    System.out.println("支付失败");
+                }
+            });
+        } catch (PayException e) {
             e.printStackTrace();
         }
     }

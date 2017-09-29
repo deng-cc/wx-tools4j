@@ -10,6 +10,7 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
+import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.File;
@@ -35,6 +36,30 @@ import java.security.SecureRandom;
  */
 public class NetUtil {
     private static Logger log = Logger.getLogger(NetUtil.class);
+
+    /**
+     * 解析request请求中的inputStream为字符串
+     *
+     * @param request http请求
+     * @return 字符串
+     */
+    public static String parseRequest(HttpServletRequest request) {
+        InputStream inputStream = null;
+        StringBuffer buffer = new StringBuffer();
+        try {
+            inputStream = request.getInputStream();
+            InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
+            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+            String str = null;
+            while ((str = bufferedReader.readLine()) != null) {
+                buffer.append(str);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return buffer.toString();
+    }
 
     /**
      * 以GET请求方式调用微信url接口，以获取对应结果的字符串

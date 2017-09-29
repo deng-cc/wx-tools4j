@@ -13,6 +13,7 @@ import dulk.wx4j.base.util.XmlUtil;
 import dulk.wx4j.pay.api.WxPayAPI;
 import dulk.wx4j.pay.domain.PayRequestJSAPI;
 import dulk.wx4j.pay.domain.PayRequestNATIVE;
+import dulk.wx4j.pay.domain.PayResult;
 import dulk.wx4j.pay.domain.RefundRequest;
 import dulk.wx4j.pay.domain.RefundResponse;
 import dulk.wx4j.pay.domain.UnifiedorderRequest;
@@ -32,6 +33,8 @@ import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 
 import javax.net.ssl.SSLContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -264,10 +267,67 @@ public class WxPayService {
         }
         RefundResponse refundResponse = null;
         refundResponse = result != null ? XmlUtil.toBean(result, RefundResponse.class) : null;
+        if ("FAIL".equals(refundResponse.getReturnCode())) {
+            throw new PayException("申请退款接口调用失败: " + refundResponse.getReturnMsg());
+        }
         if ("FAIL".equals(refundResponse.getResultCode())) {
             throw new PayException("退款失败: " + refundResponse.getErrCode() + ":" + refundResponse.getErrCodeDesc());
         }
         return refundResponse;
+    }
+
+    /**
+     * 微信支付后的业务处理和应答
+     * <p>
+     * 支付后微信会向支付时填写的notifyUrl服务器地址发送请求，包含支付情况以供服务器在业务上进行处理。
+     * 同时要求服务器针对支付情况，对微信进行相关应答，否则微信会持续发送请求到该地址。
+     * </p>
+     * <p>
+     * 开发者在调用该方法时，可以选择在WxPayHandler中实现业务处理，该方法会自动调用业务处理方法；
+     * 或者传入null空值，用该方法返回的支付结果封装类，另行处理业务。
+     * </p>
+     * <p>
+     * 文档参考 https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=9_7
+     * </p>
+     *
+     * @param request  微信服务器发送来的请求
+     * @param response 给微信服务器的响应
+     * @param handler  业务处理接口的实现类
+     * @return 微信支付结果的封装类
+     * @throws PayException
+     */
+    public static PayResult afterWxPay(HttpServletRequest request, HttpServletResponse response, WxPayHandler handler) throws PayException {
+        PayResult payResult = null;
+        try {
+            payResult = XmlUtil.toBean(request.getInputStream(), PayResult.class);
+            //签名和订单金额校验
+            if (payResult.getSign() != null && !payResult.getSign().equals(SignUtil.createSign(payResult.toTreeMap()))) {
+                String errMsg = "签名验证失败，可能出现了\"伪造的微信支付结果通知\"";
+                log.error(errMsg);
+                throw new PayException(errMsg);
+            }
+            //业务处理和应答
+            String returnCode = payResult.getReturnCode();
+            String resultCode = payResult.getResultCode();
+            if ("SUCCESS".equals(returnCode) && "SUCCESS".equals(resultCode)) {
+                handler.doWithSuccess(payResult);
+                String responseContent = "<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>";
+                response.getWriter().write(responseContent);
+            } else {
+                handler.doWithFail(payResult);
+                String responseContent = "<xml><return_code><![CDATA[FAIL]]></return_code><return_msg><![CDATA[NG]]></return_msg></xml>";
+                response.getWriter().write(responseContent);
+                String errMsg = "支付结果通知失败: " +
+                        (payResult.getErrCodeDesc() != null? (payResult.getErrCode() + ":" + payResult.getErrCodeDesc()) : payResult.getReturnMsg());
+                log.warn(errMsg);
+                throw new PayException(errMsg);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return payResult;
     }
 
 }

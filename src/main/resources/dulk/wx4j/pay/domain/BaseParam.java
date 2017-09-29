@@ -10,9 +10,10 @@ import java.lang.reflect.Method;
 import java.util.TreeMap;
 
 /**
- * 接口请求的参数封装类基类
+ * 参数封装类的基类
  */
-public abstract class BaseRequest {
+public abstract class BaseParam {
+
     /**
      * 将对象中不为空的属性和值转换为TreeMap以进行签名运算
      * <p>
@@ -20,12 +21,12 @@ public abstract class BaseRequest {
      * 注意：sign属性不参与转换，因为在后续的签名算法中不需要sign
      * </p>
      * <p>
-     * 该类作为提供方法的父类以继承，如果是BaseRequest类的子类的子类，需要注意若有添加新的属性，会被丢失无法解析
+     * 该类作为提供方法的父类以继承，如果是BaseParam类的子类的子类，需要注意若有添加新的属性，会被丢失无法解析
      * </p>
      *
      * @return 以属性：值存储的TreeMap
      */
-    private TreeMap<String, String> toTreeMap() {
+    public TreeMap<String, String> toTreeMap() {
         TreeMap<String, String> map = new TreeMap<String, String>();
         Field[] fields = this.getClass().getDeclaredFields();
         if (fields.length == 0) {
@@ -37,7 +38,8 @@ public abstract class BaseRequest {
             try {
                 Method method = this.getClass().getMethod(getter);
                 Object value = method.invoke(this);
-                if (value != null && !"sign".equals(fieldName) && field.isAnnotationPresent(XStreamAlias.class)) {
+                if (value != null && !"0".equals(value.toString())
+                        && !"sign".equals(fieldName) && field.isAnnotationPresent(XStreamAlias.class)) {
                     String name = field.getAnnotation(XStreamAlias.class).value();
                     map.put(name, value.toString());
                 }

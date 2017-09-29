@@ -8,7 +8,7 @@ import dulk.wx4j.pay.util.SignUtil;
  * 申请退款的请求参数封装类
  */
 @XStreamAlias("xml")
-public class RefundRequest extends BaseRequest {
+public class RefundRequest extends BaseParam {
 
     /**
      * 公众账号id

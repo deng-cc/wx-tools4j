@@ -52,7 +52,7 @@ public class SignUtil {
         //获得signValue
         signValue = encryptByMD5(stringSignTemp).toUpperCase();
 
-        log.debug("unifiedorder sign: " + signValue);
+        log.debug("签名: " + signValue);
         return signValue;
     }
 

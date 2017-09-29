@@ -9,7 +9,7 @@ import dulk.wx4j.pay.util.SignUtil;
  * 请求统一下单接口时的参数封装类
  */
 @XStreamAlias("xml")
-public class UnifiedorderRequest extends BaseRequest{
+public class UnifiedorderRequest extends BaseParam {
 
     //必需参数
 
