@@ -310,11 +310,15 @@ public class WxPayService {
             String returnCode = payResult.getReturnCode();
             String resultCode = payResult.getResultCode();
             if ("SUCCESS".equals(returnCode) && "SUCCESS".equals(resultCode)) {
-                handler.doWithSuccess(payResult);
+                if (handler != null) {
+                    handler.doWithSuccess(payResult);
+                }
                 String responseContent = "<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>";
                 response.getWriter().write(responseContent);
             } else {
-                handler.doWithFail(payResult);
+                if (handler != null) {
+                    handler.doWithFail(payResult);
+                }
                 String responseContent = "<xml><return_code><![CDATA[FAIL]]></return_code><return_msg><![CDATA[NG]]></return_msg></xml>";
                 response.getWriter().write(responseContent);
                 String errMsg = "支付结果通知失败: " +

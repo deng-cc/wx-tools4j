@@ -82,4 +82,40 @@ protected void doMenu_View() {
 
 工具包中部分“限制”，尤其是素材管理部分，是按照微信文档进行编写的，如上传图片的类型，大小等等，但实际上的微信接口和文档限制并不完全一致，精力有限，没有进行一一核对，如若需要更改，可以到对应的XxxAPI类中进行修改。
 
+# 4、部分方法附录
+4.1 wx4j.base
+4.1.1 wx4j.base.dispatch.WxSupport
+- execute() 微信信息和事件处理的执行入口，执行数据的接受和事件分发
+
+4.1.2 wx4j.base.service.WxBaseService
+- getNewAccessToken() 立即获取一个新的微信接口凭证
+
+4.1.3 wx4j.base.util.NetUtil
+- throwRequestGET() 请求微信url接口，返回字符串
+- sendRequestGET() 请求微信url接口，返回JSONObject
+- sendRequestGET() 请求微信url接口，获取File
+- throwRequestPOST()
+- sendRequestPOST()
+- sendRequestPOST() 
+
+4.2 wx4j.material
+4.2.1 wx4j.material.service
+- uploadTempXxx() 上传临时Xxx素材
+- uploadPermXxx() 上传永久Xxx素材
+- downloadTempXxx() 下载临时Xxx素材
+- downloadPermXxx() 下载永久Xxx素材
+
+4.3 wx4j.message
+4.3.1 wx4j.message.service
+
+
+4.4 wx4j.pay
+4.4.1 wx4j.pay.service
+- wxPayByJSAPI() 微信支付（JSAPI方式）
+- wxPayByNATIVE() 微信支付（二维码方式）
+- wxRefund() 微信退款
+- afterWxPay() 微信支付后的业务处理和应答
+
+
+
   [1]: https://github.com/sword-org/wechat4j
