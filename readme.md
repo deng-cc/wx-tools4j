@@ -82,8 +82,9 @@ protected void doMenu_View() {
 
 工具包中部分“限制”，尤其是素材管理部分，是按照微信文档进行编写的，如上传图片的类型，大小等等，但实际上的微信接口和文档限制并不完全一致，精力有限，没有进行一一核对，如若需要更改，可以到对应的XxxAPI类中进行修改。
 
+
 # 4、部分方法附录
-4.1 wx4j.base
+4.1 wx4j.base<br>
 4.1.1 wx4j.base.dispatch.WxSupport
 - execute() 微信信息和事件处理的执行入口，执行数据的接受和事件分发
 
@@ -98,18 +99,19 @@ protected void doMenu_View() {
 - sendRequestPOST()
 - sendRequestPOST() 
 
-4.2 wx4j.material
+4.2 wx4j.material<br>
 4.2.1 wx4j.material.service
 - uploadTempXxx() 上传临时Xxx素材
 - uploadPermXxx() 上传永久Xxx素材
 - downloadTempXxx() 下载临时Xxx素材
 - downloadPermXxx() 下载永久Xxx素材
 
-4.3 wx4j.message
+4.3 wx4j.message<br>
 4.3.1 wx4j.message.service
+- sendAllByTag() 根据标签群发消息
 
 
-4.4 wx4j.pay
+4.4 wx4j.pay<br>
 4.4.1 wx4j.pay.service
 - wxPayByJSAPI() 微信支付（JSAPI方式）
 - wxPayByNATIVE() 微信支付（二维码方式）

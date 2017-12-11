@@ -5,6 +5,8 @@ import dulk.wx4j.base.domain.message.Video;
 import dulk.wx4j.base.exception.WxException;
 import dulk.wx4j.material.exception.MaterialException;
 import dulk.wx4j.material.service.WxMaterialService;
+import dulk.wx4j.message.domain.PushVideoByTag;
+import dulk.wx4j.message.service.WxMessageService;
 import dulk.wx4j.pay.domain.PayResult;
 import dulk.wx4j.pay.exception.PayException;
 import dulk.wx4j.pay.service.WxPayHandler;
@@ -102,7 +104,11 @@ public class WxAction extends WxSupport{
                     getRealPath("/WEB-INF/temp/video") + "/" + file.getFileItem().getName();
             File temp = new File(path);
             FileUtils.copyInputStreamToFile(file.getInputStream(), temp);
-            WxMaterialService.uploadTempVideo(temp);
+            //doit waiting to test
+            //YSZVZHKoFU2fhiFlI9T6d89r1FnQxBTmCJk5-ln0YI16wmZy8XKxfO2Q5s-0C-Ga
+            String mediaId = WxMaterialService.uploadTempVideo(temp);
+            PushVideoByTag msg = new PushVideoByTag(mediaId, true, 0);
+            WxMessageService.sendAllByTag(msg);
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -114,6 +120,8 @@ public class WxAction extends WxSupport{
             e.printStackTrace();
         }
     }
+
+
 
 
     /**

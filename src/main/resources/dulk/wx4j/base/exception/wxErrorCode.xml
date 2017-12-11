@@ -41,8 +41,7 @@
 	</error>
 	<error>
 		<code>40007</code>
-		<text>已上传的素材文件失效</text>
-		<msg>无效的media_id</msg>
+		<text>无效的media_id</text>
 	</error>
 	<error>
 		<code>40008</code>
