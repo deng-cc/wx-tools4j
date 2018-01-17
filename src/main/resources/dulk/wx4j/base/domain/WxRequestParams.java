@@ -165,6 +165,11 @@ public class WxRequestParams {
     @XStreamAlias("Precision")
     private String precision;
 
+    /**
+     * 菜单id
+     */
+    @XStreamAlias("MenuId")
+    private String menuId;
 
     public String getToUserName() {
         return toUserName;
@@ -364,5 +369,13 @@ public class WxRequestParams {
 
     public void setPrecision(String precision) {
         this.precision = precision;
+    }
+
+    public String getMenuId() {
+        return menuId;
+    }
+
+    public void setMenuId(String menuId) {
+        this.menuId = menuId;
     }
 }
